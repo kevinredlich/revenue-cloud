@@ -5,6 +5,7 @@
 **Cliente:** Bodegas Altiplano SA · **Sector:** Vino (bodega) · **Zona fiscal:** Península (IVA 21%)
 **Nube ancla:** Revenue Cloud (RLM) · **Nubes de apoyo:** — · **Org objetivo:** SDO con Revenue Cloud provisionado
 **Incertidumbre:** ¿El motor de pricing estándar de Revenue Cloud puede aplicar un descuento por volumen escalonado (no plano) sin desarrollo a medida?
+**Fuentes consultadas (rlm-skill):** `subskills/revenue-cloud-data-model/domains/pricing.md`; `references/apis/pricing-business-apis-v68.md`; Help 264 "Create Attribute Based Adjustments"
 **Restricciones del SE:** Solo mecanismos estándar de Pricing; nada de Apex para el cálculo
 **Reparto:** IA 5 (71%) · IA+Revisión 1 · Persona 1 · **Niveles:** 🟢 2 · 🔵 4 · 🟠 0
 
@@ -37,6 +38,13 @@
 | CMP-5 | EXP-2 | Línea con cantidad 150 | QuoteLineItem | Estándar SF | Quantity = 150 sobre CMP-1 | 🟢 | IA | — | S | Pendiente |
 | CMP-6 | EXP-3 | Consulta de verificación | Report | Estándar SF | Report sobre QuoteLineItem: cantidad, precio unitario, total | 🔵 | IA+Revisión | Confirmar que el filtro y las columnas muestran el dato correcto | S | Pendiente |
 | CMP-7 | EXP-1 | Permisos de prueba | PermissionSet | Estándar SF | CRUD sobre Product2, Quote, QuoteLineItem; acceso a Pricing | 🔵 | IA | — | S | Pendiente |
+
+## 3.1 Verificación de nombres y valores de API
+| Objeto | Campo / valor | Valor usado | Clase | Referencia |
+|--------|---------------|-------------|-------|------------|
+| PriceAdjustmentSchedule | Name | `Name` | DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` (tabla Core Pricing) |
+| PriceAdjustmentTier | LowerBound, UpperBound | `LowerBound`, `UpperBound` | DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` (PriceAdjustmentTier) |
+| PriceAdjustmentTier | Tipo de ajuste porcentual | `Percentage` | DERIVADO | Help 264 "Create Attribute Based Adjustments" (Percentage / Amount / Override) y `pricing-business-apis-v68.md` (percentage, amount, override); la capitalización del picklist del objeto se valida con describe antes de cargar |
 
 ## 4. Tareas de persona
 ### CMP-3 — Verificar licencia Revenue Cloud
