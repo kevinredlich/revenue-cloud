@@ -8,7 +8,9 @@ description: >
   ficticios) pero sustituye escenas-y-wow por pasos de experimento ligados a una hipótesis, y el
   pitch por un informe de viabilidad. Úsala SIEMPRE que el usuario quiera comprobar si algo "se
   puede hacer" en Revenue Cloud, validar una hipótesis técnica o de pricing/configurador, o pida
-  explícitamente una POC en vez de una demo.
+  explícitamente una POC en vez de una demo. También cuando se pida diseñar o configurar una demo
+  de Revenue Cloud (catálogo, atributos, precios, bundles): el diseño técnico pasa por las mismas
+  reglas (rlm-skill obligatoria, viabilidad estándar vs custom real, mejor diseño).
 ---
 
 # Revenue Cloud — del brief/incertidumbre a la POC
@@ -33,7 +35,7 @@ bajo qué condiciones?"**, no "¿cómo gusta esto al cliente?". Antes de usarla,
   indica "no disponible" y **todo lo técnico se marca `SUPUESTO`**: el diseño no se presenta como
   validado.
 - **`references/reglas-modelado-catalogo-rlm.md`** — reglas obligatorias de modelado (Regla cero,
-  R1–R12), checklist de pre-entrega y correcciones conocidas de nombres y valores de API. Léelo antes
+  R1–R14), checklist de pre-entrega y correcciones conocidas de nombres y valores de API. Léelo antes
   de diseñar y antes de entregar.
 
 ## FASE 0 — Intake unificado (antes de decidir DEMO / POC / Migración)
@@ -61,7 +63,11 @@ una recomendación técnica, nunca una aprobación del cliente. Se para ahí y s
 corto (semáforo, modalidad propuesta, preguntas de refinamiento). Solo tras la confirmación
 (sección 4, o en conversación) se activa el workflow correspondiente:
 - **DEMO** → `nespon-brief-to-demo`, usando `MANIFIESTO-NECESIDADES.md` como brief de entrada (las
-  `NEC-n` ya clasificadas sustituyen la lectura manual del documento original).
+  `NEC-n` ya clasificadas sustituyen la lectura manual del documento original). **Todo el diseño
+  técnico de Revenue Cloud de la demo pasa por la Regla cero y R1–R14 de
+  `references/reglas-modelado-catalogo-rlm.md`** (rlm-skill primero, tablas 3.1–3.3, prueba
+  funcional con valores esperados): la demo no es una vía con menos exigencia que la POC. Si el
+  playbook de `nespon-brief-to-demo`/`nespon-demo-builder` contradice a `rlm-skill`, manda `rlm-skill`.
 - **POC o Migración** (migración = POC cuya incertidumbre viene de un scan, no un workflow
   distinto) → continúa con la FASE 1 de esta misma skill, reutilizando las `NEC-n` ya confirmadas
   en vez de re-derivarlas desde cero. Con origen scan, vuelve a correr `scan_to_poc.py` con
@@ -112,6 +118,11 @@ tabla **3.1** del manifiesto con su clase (`DOC` / `DERIVADO` / `SUPUESTO`) y su
 tabla **3.2** como `ESTÁNDAR`, `ESTÁNDAR A VALIDAR` o `CUSTOM REAL`, tras leer el artículo de Help y
 sus límites. Si no se puede de forma estándar, se ofrece un diseño custom real (con piezas reales de
 la plataforma) junto a la opción estándar más cercana; no se inventan objetos, campos ni valores.
+**El objetivo es el mejor diseño real, no el más corto (R13):** cada decisión no trivial compara al
+menos dos alternativas y queda en la tabla **3.3** con la elegida, las descartadas y el motivo
+(encaje con RLM, jerarquía estándar > configuración > declarativo > código > objeto propio,
+coherencia, mantenimiento, esfuerzo). Un custom bien justificado es correcto; un custom
+injustificado o un estándar forzado que no funciona no lo son.
 
 Igual que en `nespon-brief-to-demo`: tabla de componentes con nivel 🟢/🔵/🟠 y responsable
 IA / IA+Revisión / Persona (`references/ia-vs-persona.md`), tareas de persona con ruta, valores,
@@ -143,9 +154,14 @@ conversación.
    checklist de pre-entrega de `references/reglas-modelado-catalogo-rlm.md`: la org valida lo
    diseñado (describe, consultas de pre-flight) pero no sustituye a la documentación; cada
    corrección que la org obligue a hacer se anota en la sección 4 de ese documento.
+   Si un pre-flight falla o la org contradice el diseño, **se para y se corrige el diseño**
+   (documento y tablas 3.1–3.3); no se parchea la org para que "cuadre".
 3. Construye los componentes en el orden del manifiesto (IA / IA+Revisión / Persona, igual que
    `construccion.md` de `nespon-brief-to-demo`).
 4. Carga los datos de prueba (`fill_data.py` → `build_seed.py` → `sf data import tree`).
+   Tras cargar, **prueba funcional con valores esperados** para cada regla de precio, atributo o
+   bundle (por ejemplo: simular el pricing o crear una cotización y comparar el precio exacto con el
+   calculado en el diseño). Una carga sin errores no prueba que el motor aplique lo cargado.
 5. **Ejecuta cada paso del experimento** y registra el resultado real observado frente al esperado,
    con su evidencia (consulta, captura, log).
 6. Clasifica cada hipótesis (ver abajo) y genera `INFORME-VIABILIDAD.md`
@@ -178,7 +194,7 @@ no si la hipótesis se cumple).
 |---|---|
 | `references/manifiesto-necesidades.md` | Fase 0: formato exacto del manifiesto de intake |
 | `references/manifiesto-poc.md` | 1.2–1.6: formato exacto del manifiesto de POC |
-| `references/reglas-modelado-catalogo-rlm.md` | Siempre antes de diseñar y de entregar: Regla cero, R1–R12 (viabilidad estándar vs custom real), checklist, valores de API |
+| `references/reglas-modelado-catalogo-rlm.md` | Siempre antes de diseñar y de entregar: Regla cero, R1–R14 (viabilidad estándar vs custom real), checklist, valores de API |
 | `references/informe-viabilidad.md` | Fase 3: formato del informe de resultado |
 | (de `nespon-brief-to-demo`) `references/ia-vs-persona.md`, `impacto.md`, `datos-demo.md` | 1.4–1.5 |
 | (de `nespon-demo-builder`) `references/nubes/revenue-cloud.md`, `ejecucion-en-org.md` | diseño y Fase 3 |

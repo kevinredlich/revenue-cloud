@@ -53,6 +53,8 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 | 10 | Un selling model por duración (Plazo 12, Plazo 18…) | RLM no admite dos selling models con el mismo tipo, plazo y unidad, y la duración se fija en la línea de la cotización, no en el selling model; además ningún elemento estándar del procedimiento de precios lee ajustes por duración | R10, R12 |
 | 11 | Ajustes por atributo sueltos y sumados (Tipo CRM + Contactos) con importes que faltaban | Una regla de ajuste exige condiciones sobre **todos** los atributos que afectan al precio; cada combinación necesita su regla e importe | R11, R12 |
 | 12 | Entregué un diseño que el motor no puede ejecutar como estaba planteado | No comprobé la **viabilidad estándar** de cada requisito contra los artículos de límites/consideraciones de la Help antes de diseñar | R12 |
+| 13 | No se exigía comparar alternativas ni elegir el mejor diseño | El proceso validaba nombres y viabilidad, pero no que la solución fuera la mejor ni coherente con el resto | R13 |
+| 14 | La ruta de demo y los playbooks de otras skills no pasaban por las mismas reglas; el generador de pre-borradores emitía el formato antiguo | Las reglas solo estaban enganchadas a la ruta POC | R14 |
 
 ## 2. Reglas
 
@@ -84,6 +86,10 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 3. **CUSTOM REAL**: RLM no lo hace de forma estándar. Se ofrece un diseño custom **construido con piezas reales de la plataforma** (expression sets / pricing procedures, decision tables, context definitions, constraint models, flows, Apex, campos o objetos propios, etc.), indicando qué objetos y elementos se tocan, el esfuerzo y el impacto en lo existente.
 Está **prohibido** (a) inventar objetos, campos o valores para que el requisito "quepa", (b) dar por soportado algo sin haber leído su artículo, (c) esconder una limitación en una nota. Si un requisito no es estándar, se dice en la primera página y se ofrece la opción estándar más cercana **y** el diseño custom real, con sus pros y contras, para que decida el usuario. Si no se puede garantizar ninguna vía, se dice "no verificado" y no se carga.
 
+**R13 · El mejor diseño, no el primero que funciona.** Para cada decisión de diseño no trivial (cómo modelar un precio, un atributo, un bundle, una regla, una excepción) se comparan **al menos dos alternativas reales** y se elige la mejor con estos criterios, por este orden: (1) **encaje con RLM**: soportada y documentada, sin forzar objetos ni campos; (2) **jerarquía de solución**: estándar nativo > configuración nativa > declarativo (flow, expression set, decision table, constraint model) > código (Apex/LWC) > objeto o campo propio; subir un escalón solo con motivo escrito; (3) **coherencia** con el resto del modelo (mismas convenciones, una sola fuente de verdad por dato, sin duplicar reglas entre catálogo, precios y transacción); (4) **mantenibilidad y actualizaciones**: que no se rompa con una release, sin dependencias frágiles; (5) esfuerzo y riesgo. **Un diseño custom es correcto cuando es la mejor opción real**, no hay que evitarlo a toda costa: lo que está prohibido es el custom injustificado o el estándar forzado que luego no funciona. La decisión queda en la sección 3.3 del manifiesto (elegida, descartadas y motivo).
+
+**R14 · Misma exigencia en demo y en POC; rlm-skill manda sobre cualquier playbook.** Los diseños para **demo** de Revenue Cloud pasan por la Regla cero, R1–R13 y las tablas 3.1–3.3 igual que una POC. Si un playbook de otra skill (p. ej. `nespon-demo-builder`, `nespon-brief-to-demo`) contradice a `rlm-skill` o a la Help 264, prevalece `rlm-skill` y se anota la discrepancia. Ningún diseño se entrega sin **prueba funcional con valores esperados** (por ejemplo, el precio exacto que debe salir para cada combinación): hasta que se ejecuta en una org, el estado es PREPARADA, NO EJECUTADA y no se afirma que funciona.
+
 ## 3. Tabla de verificación (obligatoria en cada entrega)
 
 | Objeto | Campo / valor | Valor usado | Clase (DOC / DERIVADO / SUPUESTO) | Referencia (artículo Help o fichero del kit) |
@@ -105,6 +111,9 @@ Otros fallos del incidente por corregir en el diseño: moneda parametrizada, cla
 
 ## 5. Checklist de pre-entrega
 
+- [ ] Decisiones de diseño con ≥2 alternativas comparadas y la mejor elegida con motivo (R13, sección 3.3)
+- [ ] Pruebas funcionales con valores esperados definidas para precios, atributos y bundles (R14)
+- [ ] Si es demo, mismas tablas 3.1–3.3 que una POC (R14)
 - [ ] Viabilidad por requisito: cada uno marcado ESTÁNDAR / ESTÁNDAR A VALIDAR / CUSTOM REAL con cita; ningún requisito sin vía (R12)
 - [ ] Selling models reutilizados o únicos por tipo+plazo+unidad (R10)
 - [ ] Reglas de ajuste: condiciones sobre todos los atributos de precio y combinaciones contadas (R11)

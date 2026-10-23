@@ -46,6 +46,11 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 |-----------|-----|------------|--------------------------------------|
 | <requisito del cliente> | ESTÁNDAR | `salesforce-help/264/help/<área>.md` (artículo y su sección de límites) | — |
 
+## 3.3 Decisiones de diseño (mejor alternativa)
+| Decisión | Alternativa elegida | Alternativas descartadas | Motivo (encaje RLM, jerarquía, coherencia, mantenimiento, esfuerzo) |
+|----------|---------------------|---------------------------|----------------------------------------------------------------------|
+| <p. ej. precio según duración> | <la elegida> | <al menos otra real> | <por qué es la mejor> |
+
 ## 3.1 Verificación de nombres y valores de API
 | Objeto | Campo / valor | Valor usado | Clase | Referencia |
 |--------|---------------|-------------|-------|------------|
@@ -77,6 +82,11 @@ añadida):
   context definitions, constraint models, flows, Apex, objetos o campos propios—, esfuerzo e impacto, y
   se ofrece junto a la opción estándar más cercana). Prohibido inventar objetos, campos o valores
   para que un requisito "quepa". Sin vía verificada, el requisito no se carga.
+- **Sección 3.3** (obligatoria, R13): una fila por decisión de diseño no trivial, con la alternativa
+  elegida, **al menos una descartada** y el motivo según los criterios de R13 (encaje con RLM,
+  jerarquía estándar > configuración > declarativo > código > objeto propio, coherencia con el
+  resto del modelo, mantenimiento, esfuerzo). Obligatoria si hay filas `ESTÁNDAR A VALIDAR` o
+  `CUSTOM REAL` en 3.2. Un diseño custom es válido cuando es la mejor opción real y está justificado.
 - `Nivel`: 🟢 default/config · 🔵 automatización o custom declarativo · 🟠 código.
 - `Responsable`: `IA` | `IA+Revisión` | `Persona` (criterios en `ia-vs-persona.md`).
 - `Motivo`: obligatorio si el responsable no es IA o el nivel es 🟠.
