@@ -12,6 +12,7 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 **Cliente:** … · **Sector:** … · **Zona fiscal:** Península (IVA 21%)
 **Nube ancla:** Revenue Cloud (RLM) · **Nubes de apoyo:** … · **Org objetivo:** …
 **Incertidumbre:** <la pregunta técnica o de negocio que hay que responder, en una frase>
+**Fuentes consultadas (rlm-skill):** <sub-skills y artículos de Help 264 consultados> | no disponible
 **Restricciones del SE:** <literal> | Ninguna
 **Reparto:** IA <n> (<x>%) · IA+Revisión <n> · Persona <n> · **Niveles:** 🟢 <n> · 🔵 <n> · 🟠 <n>
 
@@ -39,6 +40,11 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 | CMP-1 | EXP-1 | <nombre> | PricingRule | Estándar RLM | <condición y fórmula> | 🔵 | IA | — | S | Pendiente |
 | CMP-2 | EXP-2 | Activar Revenue Cloud | Setup | N/A | Provisión/licencia en la org | 🟢 | Persona | Requiere licencia/provisión | S | Pendiente |
 | CMP-3 | EXP-2 | <objeto a medida> | CustomObject__c | Custom object | <qué guarda y por qué no hay estándar que lo cubra, según lo verificado contra la documentación oficial / rlm-skill> | 🟠 | IA | Sin equivalente estándar verificado | M | Pendiente |
+
+## 3.1 Verificación de nombres y valores de API
+| Objeto | Campo / valor | Valor usado | Clase | Referencia |
+|--------|---------------|-------------|-------|------------|
+| PriceAdjustmentTier | LowerBound | `LowerBound` | DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` |
 ```
 Reglas de la tabla (idénticas a `nespon-brief-to-demo/references/manifiesto.md`, con una columna
 añadida):
@@ -54,6 +60,11 @@ añadida):
   de Setup/licencia que no son un objeto a crear ni usar). Esta columna es lo primero que mira
   quien ejecuta la Fase 3: le dice de un vistazo qué usar tal cual y qué construir desde cero, sin
   tener que inferirlo de la especificación.
+- **Sección 3.1** (obligatoria): un registro por cada objeto, campo o valor de picklist de API usado en
+  la sección 3. `Clase`: **DOC** (literal en Help/`rlm-skill`) · **DERIVADO** (deducido de ejemplos del
+  kit; indica el ejemplo) · **SUPUESTO** (no respaldado; se declara también en la sección 7 con su
+  consulta de validación). `Referencia` es obligatoria en DOC y DERIVADO (fichero del kit o artículo
+  de Help). Nunca se escribe la etiqueta de la UI ni un nombre inventado como valor de API.
 - `Nivel`: 🟢 default/config · 🔵 automatización o custom declarativo · 🟠 código.
 - `Responsable`: `IA` | `IA+Revisión` | `Persona` (criterios en `ia-vs-persona.md`).
 - `Motivo`: obligatorio si el responsable no es IA o el nivel es 🟠.

@@ -13,13 +13,16 @@ responder **"¿se puede hacer esto en Revenue Cloud, y bajo qué condiciones?"**
 Esta skill **extiende** `nespon-brief-to-demo` (reutiliza su reparto IA/IA+Revisión/Persona,
 niveles de impacto 🟢/🔵/🟠, generador de datos de prueba `fill_data.py`) y se apoya en
 `nespon-demo-builder` para el playbook de objetos de Revenue Cloud y la ejecución real en org.
-Si `rlm-skill` está instalada en el proyecto, es la fuente técnica autoritativa para verificar
-cualquier afirmación de una hipótesis o componente (modelo de datos, pricing, decision tables,
-expression sets); si no está, se cae al artículo de Salesforce Help y se marca
-`PENDIENTE DE VALIDACIÓN`.
+`rlm-skill` es **obligatoria para diseñar**: es la fuente técnica autoritativa de Revenue Cloud
+(modelo de datos, pricing, decision tables, expression sets, nombres y valores de API) y se
+consulta SIEMPRE primero (Regla cero de `references/reglas-modelado-catalogo-rlm.md`). Cada
+objeto, campo y valor de API del manifiesto se registra en la tabla 3.1 con su clase
+(`DOC` / `DERIVADO` / `SUPUESTO`) y su referencia. Si `rlm-skill` no está disponible, el manifiesto
+lo declara en `Fuentes consultadas` y todo lo técnico queda como `SUPUESTO`: no es un diseño validado.
+La org valida después (describe, consultas de pre-flight), pero no sustituye a la documentación.
 
 Hace falta tener cargadas (en el mismo proyecto/repo de skills): `nespon-brief-to-demo`,
-`nespon-demo-builder` y, si existe, `rlm-skill`.
+`nespon-demo-builder` y `rlm-skill`.
 
 ## Estructura de la skill
 
@@ -29,6 +32,7 @@ revenue-cloud-poc/
 ├── references/
 │   ├── manifiesto-necesidades.md             # formato exacto de MANIFIESTO-NECESIDADES.md (Fase 0)
 │   ├── manifiesto-poc.md                     # formato exacto de MANIFIESTO-POC.md (Fase 1)
+│   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R9, checklist y valores de API
 │   └── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
 ├── assets/
 │   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo completo y válido (Bodegas Altiplano)

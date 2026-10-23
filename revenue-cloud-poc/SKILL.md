@@ -21,14 +21,20 @@ bajo qué condiciones?"**, no "¿cómo gusta esto al cliente?". Antes de usarla,
   (datos de prueba).
 - `nespon-demo-builder` — playbook `references/nubes/revenue-cloud.md` (objetos y escenas
   canónicas de RLM) y, para la Fase 3 real, `references/ejecucion-en-org.md`.
-- **`rlm-skill`** — fuente técnica autoritativa de RLM (modelo de datos, APIs, pricing, decision
-  tables, expression sets, constraint models...). **Úsala en vez del link genérico de Salesforce
-  Help** para verificar cualquier afirmación técnica de una hipótesis o un componente: antes de dar
-  una hipótesis por viable en el diseño, consulta el sub-skill que toque (p. ej.
-  `subskills/revenue-cloud-data-model/domains/pricing.md` para dudas de modelo de datos de pricing,
-  `subskills/pricing-wiring/guide.md` para cómo se conectan recipes/procedure plans, o
-  `references/apis/*.md` para endpoints). Si `rlm-skill` no está instalada en el proyecto, cae al
-  link de `nespon-demo-builder` y marca la afirmación como `PENDIENTE DE VALIDACIÓN`.
+- **`rlm-skill` — OBLIGATORIA para diseñar.** Es la fuente técnica autoritativa de RLM (modelo de
+  datos, APIs, pricing, decision tables, expression sets, constraint models...). **Para diseñar
+  cualquier solución técnica o funcional de Revenue Cloud se consulta SIEMPRE primero**, en este
+  orden: (1) `SKILL.md` de `rlm-skill` y elegir sub-skill; (2) su `guide.md` y los ficheros que
+  cite (p. ej. `subskills/revenue-cloud-data-model/domains/pricing.md`,
+  `subskills/pricing-wiring/guide.md`, `references/apis/*.md`); (3) el artículo de Help 264 de cada
+  objeto o feature que intervenga; (4) citar la fuente de cada decisión en la tabla 3.1 del
+  manifiesto. No se diseña de memoria ni con el link genérico de Salesforce Help. Si `rlm-skill` no
+  está disponible en la sesión, se dice al principio, el campo `Fuentes consultadas` del manifiesto
+  indica "no disponible" y **todo lo técnico se marca `SUPUESTO`**: el diseño no se presenta como
+  validado.
+- **`references/reglas-modelado-catalogo-rlm.md`** — reglas obligatorias de modelado (Regla cero,
+  R1–R9), checklist de pre-entrega y correcciones conocidas de nombres y valores de API. Léelo antes
+  de diseñar y antes de entregar.
 
 ## FASE 0 — Intake unificado (antes de decidir DEMO / POC / Migración)
 **Esto va primero, siempre, venga el origen de un brief escrito a mano o de un scan de CPQ Scout.**
@@ -98,6 +104,11 @@ Cada paso liga a ≥1 `HIP`, con condición de entrada, acción y **resultado es
 migraciones de datos completas, todo lo que no sirva para comprobar la hipótesis.
 
 ### 1.4 Componentes y reparto
+Antes de especificar un componente, aplica la Regla cero de `references/reglas-modelado-catalogo-rlm.md`
+(consultar `rlm-skill`). Cada objeto, campo y valor de picklist de la especificación debe ser el nombre
+y valor de API reales (nunca la etiqueta de la UI ni un nombre inventado) y queda registrado en la
+tabla **3.1** del manifiesto con su clase (`DOC` / `DERIVADO` / `SUPUESTO`) y su referencia.
+
 Igual que en `nespon-brief-to-demo`: tabla de componentes con nivel 🟢/🔵/🟠 y responsable
 IA / IA+Revisión / Persona (`references/ia-vs-persona.md`), tareas de persona con ruta, valores,
 comprobación y qué desbloquean.
@@ -124,7 +135,10 @@ conversación.
 ## FASE 3 — Ejecución del experimento (solo con org y sf CLI — Claude Code / Vibes)
 
 1. **Puerta:** `validate_manifest_poc.py --gate`; sin `APROBADO` no se toca la org.
-2. Pre-flight de `nespon-demo-builder` (org confirmada, licencias de Revenue Cloud/RLM).
+2. Pre-flight de `nespon-demo-builder` (org confirmada, licencias de Revenue Cloud/RLM) y
+   checklist de pre-entrega de `references/reglas-modelado-catalogo-rlm.md`: la org valida lo
+   diseñado (describe, consultas de pre-flight) pero no sustituye a la documentación; cada
+   corrección que la org obligue a hacer se anota en la sección 4 de ese documento.
 3. Construye los componentes en el orden del manifiesto (IA / IA+Revisión / Persona, igual que
    `construccion.md` de `nespon-brief-to-demo`).
 4. Carga los datos de prueba (`fill_data.py` → `build_seed.py` → `sf data import tree`).
@@ -160,10 +174,11 @@ no si la hipótesis se cumple).
 |---|---|
 | `references/manifiesto-necesidades.md` | Fase 0: formato exacto del manifiesto de intake |
 | `references/manifiesto-poc.md` | 1.2–1.6: formato exacto del manifiesto de POC |
+| `references/reglas-modelado-catalogo-rlm.md` | Siempre antes de diseñar y de entregar: Regla cero, R1–R9, checklist, valores de API |
 | `references/informe-viabilidad.md` | Fase 3: formato del informe de resultado |
 | (de `nespon-brief-to-demo`) `references/ia-vs-persona.md`, `impacto.md`, `datos-demo.md` | 1.4–1.5 |
 | (de `nespon-demo-builder`) `references/nubes/revenue-cloud.md`, `ejecucion-en-org.md` | diseño y Fase 3 |
-| (de `rlm-skill`, si está instalada) `SKILL.md` (enrutador a 13 sub-skills + 1.131 artículos de Help) | verificar cualquier hipótesis o componente técnico antes de darlo por viable |
+| (de `rlm-skill`, obligatoria) `SKILL.md` (enrutador a 13 sub-skills + 1.131 artículos de Help) | diseñar y verificar cualquier hipótesis o componente técnico antes de darlo por viable |
 
 | Script | Para qué |
 |---|---|

@@ -13,6 +13,10 @@ tiene que crear desde cero (Custom object), sin tener que inferirlo de la especi
 Uso:
   python3 validate_manifest_poc.py MANIFIESTO-POC.md          # validación de diseño (Fase 1)
   python3 validate_manifest_poc.py MANIFIESTO-POC.md --gate   # además exige APROBADO (Fase 3)
+Regla cero (references/reglas-modelado-catalogo-rlm.md): exige constancia de que se consultó rlm-skill
+('Fuentes consultadas'), la tabla 3.1 de verificación de nombres y valores de API (Clase DOC/DERIVADO/
+SUPUESTO, con referencia) y rechaza valores de API conocidos como incorrectos (Month, Year,
+AdjustmentAmount...). Sin ellos: AVISO en validación de diseño, ERROR con --gate.
 Sale con 1 si hay errores.
 """
 import re
@@ -22,6 +26,11 @@ RESP = {"IA", "IA+Revisión", "Persona"}
 NIVEL = {"🟢", "🔵", "🟠"}
 ORIGEN = {"Estándar SF", "Estándar RLM", "Custom object", "N/A"}
 ESTADO = {"Pendiente", "Hecho", "Bloqueado", "Persona pendiente"}
+CLASE = {"DOC", "DERIVADO", "SUPUESTO"}
+# Valores que en esta skill se han escrito mal antes (etiqueta de UI o valor inventado) -> valor correcto.
+# Fuente: references/reglas-modelado-catalogo-rlm.md, sección 4. Solo se detectan entre `backticks`.
+BAD_API = {"Month": "Months", "Year": "Annual", "AdjustmentAmount": "Amount",
+           "Last pricing period": "AddToLast", "ProductAttributeAllowedValue": "AttrPicklistExcludedValue (exclusiones, no permitidos)"}
 SYSTEM_FIELDS = ["LastStageChangeDate", "IsClosed", "IsWon", "HasOpenActivity", "LastActivityDate",
                  "LastViewedDate", "SystemModstamp", "IsEscalated", "ClosedDate"]
 ABS_DATE = re.compile(r"\b20\d\d-\d\d-\d\d\b|\b\d{1,2}/\d{1,2}/20\d\d\b")
@@ -62,6 +71,47 @@ def main(path, gate):
 
     if not re.search(r"\*\*Incertidumbre:\*\*\s*\S", text):
         E.append("Cabecera: falta 'Incertidumbre' (la pregunta que hay que responder)")
+
+    # Regla cero: rlm-skill consultada y citada (references/reglas-modelado-catalogo-rlm.md)
+    fu = re.search(r"\*\*Fuentes consultadas \(rlm-skill\):\*\*\s*([^\n]*)", text)
+    fuentes = fu.group(1).strip() if fu else ""
+    if not fu:
+        W.append("Cabecera: falta 'Fuentes consultadas (rlm-skill)' (Regla cero: consultar rlm-skill antes de diseñar)")
+        if gate:
+            E.append("PUERTA: falta 'Fuentes consultadas (rlm-skill)'")
+    elif re.search(r"no disponible|ninguna|^[—-]$|^$|<", fuentes, re.I):
+        W.append("rlm-skill no consultada o no disponible: el diseño técnico no está validado; todo debe constar como SUPUESTO en 3.1")
+
+    # Valores de API conocidos como incorrectos (etiqueta de UI o inventados)
+    for tok in re.findall(r"`([^`\n]+)`", text):
+        if tok in BAD_API:
+            E.append(f"Valor de API incorrecto `{tok}`: usar {BAD_API[tok]} (ver references/reglas-modelado-catalogo-rlm.md, sección 4)")
+
+    # Sección 3.1: tabla de verificación de nombres y valores de API
+    ver = section(text, "3.1")
+    clases = {"DOC": 0, "DERIVADO": 0, "SUPUESTO": 0}
+    for line in ver.splitlines():
+        s = line.strip()
+        if not s.startswith("|"):
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        if len(cells) < 5 or cells[0].lower() == "objeto" or re.fullmatch(r"[-: ]+", cells[0]):
+            continue
+        obj, campo, valor, clase, ref = cells[:5]
+        if clase not in CLASE:
+            E.append(f"3.1 {obj}/{campo}: Clase '{clase}' no válida (DOC | DERIVADO | SUPUESTO)")
+            continue
+        clases[clase] += 1
+        if clase in ("DOC", "DERIVADO") and ref in ("—", "-", ""):
+            E.append(f"3.1 {obj}/{campo}: {clase} sin referencia (fichero del kit o artículo de Help)")
+    if not ver.strip():
+        W.append("Falta '## 3.1 Verificación de nombres y valores de API' (nombres y valores de API sin respaldo documental)")
+        if gate:
+            E.append("PUERTA: falta la sección 3.1 de verificación de API")
+    elif sum(clases.values()) == 0:
+        W.append("3.1 no tiene filas: registra cada objeto, campo y valor de API usado en la sección 3")
+    if clases["SUPUESTO"] and not re.search(r"SUPUESTO|Supuesto", section(text, "7.")):
+        W.append(f"3.1 tiene {clases['SUPUESTO']} SUPUESTO(s) que no se declaran en la sección 7 con su consulta de validación")
 
     nec = rows(text, "NEC")
     nec_ids = {r[0] for r in nec}
@@ -183,7 +233,8 @@ def main(path, gate):
           f"IA+Revisión {resp['IA+Revisión']} · Persona {resp['Persona']} · "
           f"🟢 {lvl['🟢']} · 🔵 {lvl['🔵']} · 🟠 {lvl['🟠']} · "
           f"Estándar SF {origen_count['Estándar SF']} · Estándar RLM {origen_count['Estándar RLM']} · "
-          f"Custom object {origen_count['Custom object']} · N/A {origen_count['N/A']}")
+          f"Custom object {origen_count['Custom object']} · N/A {origen_count['N/A']} · "
+          f"API: DOC {clases['DOC']} · DERIVADO {clases['DERIVADO']} · SUPUESTO {clases['SUPUESTO']}")
     for w in W:
         print("AVISO  ", w)
     for e in E:

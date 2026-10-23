@@ -14,6 +14,7 @@ revenue-cloud-poc/
 ├── references/
 │   ├── manifiesto-necesidades.md             # formato de MANIFIESTO-NECESIDADES.md (Fase 0)
 │   ├── manifiesto-poc.md                     # formato de MANIFIESTO-POC.md (Fase 1)
+│   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R9, checklist y valores de API
 │   └── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
 ├── assets/
 │   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo válido (Bodegas Altiplano) — ya pasa el validador
@@ -113,9 +114,10 @@ python3 revenue-cloud-poc/scripts/validate_manifest_poc.py revenue-cloud-poc/eje
   conectado a una org, o el conector Salesforce de claude.ai autorizado. Un Project nuevo sin
   ejecución de código ni conector no puede escribir en ninguna org — y no debe fingir que lo hizo.
 - **`rlm-skill`**: no está incluida en este paquete (es grande, ~6.7 MB, y es propia del equipo,
-  no de esta skill). Sin ella, cualquier verificación técnica de una hipótesis caerá al enlace
-  genérico de Salesforce Help y se marcará `PENDIENTE DE VALIDACIÓN` — es el comportamiento
-  correcto, no un fallo.
+  no de esta skill), pero **es obligatoria para diseñar** una solución real de Revenue Cloud (Regla
+  cero de `references/reglas-modelado-catalogo-rlm.md`). Sin ella el manifiesto declara "no
+  disponible" en `Fuentes consultadas` y todo lo técnico se marca `SUPUESTO`: sirve para probar el
+  flujo y el formato, no como diseño validado.
 - **`nespon-brief-to-demo` / `nespon-demo-builder`**: tampoco incluidas aquí. Son necesarias para
   el camino DEMO y para los recursos compartidos (`ia-vs-persona.md`, `impacto.md`,
   `datos-demo.md`, `fill_data.py`). Si el Project nuevo no las tiene, el camino POC descrito arriba
