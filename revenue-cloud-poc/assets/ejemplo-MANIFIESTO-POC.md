@@ -39,6 +39,12 @@
 | CMP-6 | EXP-3 | Consulta de verificación | Report | Estándar SF | Report sobre QuoteLineItem: cantidad, precio unitario, total | 🔵 | IA+Revisión | Confirmar que el filtro y las columnas muestran el dato correcto | S | Pendiente |
 | CMP-7 | EXP-1 | Permisos de prueba | PermissionSet | Estándar SF | CRUD sobre Product2, Quote, QuoteLineItem; acceso a Pricing | 🔵 | IA | — | S | Pendiente |
 
+## 3.2 Viabilidad por requisito
+| Requisito | Vía | Referencia | Matiz / prueba o diseño custom real |
+|-----------|-----|------------|--------------------------------------|
+| Descuento por volumen con tramos de cantidad | ESTÁNDAR | `subskills/revenue-cloud-data-model/domains/pricing.md` (PriceAdjustmentTier); Help 264 "Volume-Based Discounts" | — |
+| Precio distinto según duración del contrato | CUSTOM REAL | Help 264 pricing (sin elemento estándar por duración) | Tabla de decisión propia de ajuste por duración y elemento en el pricing procedure que la lea; toca la demo que comparte selling models; esfuerzo M. Alternativa estándar: atributo de precio "Duración" con regla por combinación |
+
 ## 3.1 Verificación de nombres y valores de API
 | Objeto | Campo / valor | Valor usado | Clase | Referencia |
 |--------|---------------|-------------|-------|------------|
