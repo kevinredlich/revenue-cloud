@@ -50,6 +50,9 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 | 7 | Valores de `Product2.Family` inexistentes | Asumí valores de un picklist estándar sin declararlos como prerrequisito de alta | R2 |
 | 8 | Objetos/columnas con nombres propios (p. ej. `ProductAttributeAllowedValue`) | Nombré cosas sin comprobar que existieran en la documentación | R5 |
 | 9 | Dudas relegadas a una hoja "Sin verificar" al final | Las traté como nota, no como parte del diseño | R6 |
+| 10 | Un selling model por duración (Plazo 12, Plazo 18…) | RLM no admite dos selling models con el mismo tipo, plazo y unidad, y la duración se fija en la línea de la cotización, no en el selling model; además ningún elemento estándar del procedimiento de precios lee ajustes por duración | R10, R12 |
+| 11 | Ajustes por atributo sueltos y sumados (Tipo CRM + Contactos) con importes que faltaban | Una regla de ajuste exige condiciones sobre **todos** los atributos que afectan al precio; cada combinación necesita su regla e importe | R11, R12 |
+| 12 | Entregué un diseño que el motor no puede ejecutar como estaba planteado | No comprobé la **viabilidad estándar** de cada requisito contra los artículos de límites/consideraciones de la Help antes de diseñar | R12 |
 
 ## 2. Reglas
 
@@ -71,6 +74,16 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 
 **R9 · Leer el artículo, no solo el índice.** Antes de generar el fichero de un objeto, leer su artículo de Help (p. ej. "Create Attribute Based Adjustments", "Create a Proration Policy for a Subscription", "Define Product Selling Models") y copiar sus campos obligatorios.
 
+**R10 · Selling models: tipo de cobro, no duración.** Un selling model = tipo (`OneTime`/`TermDefined`/`Evergreen`) + plazo + unidad, **único en la org**. Antes de crear uno, consultar los existentes y reutilizarlos. La duración concreta de un contrato `TermDefined` se fija en la línea, no multiplicando selling models. No crear un selling model por cada duración comercial.
+
+**R11 · Ajustes por atributo = matriz completa.** Cada `AttributeBasedAdjRule` lleva una `AttributeAdjustmentCondition` por **cada** atributo marcado como que afecta al precio. Dos atributos con precio implican una regla por cada combinación de valores permitidos (N x M), con su importe (suma o el que corresponda). Contar las combinaciones **antes** de diseñar. Si son demasiadas, reducir atributos de precio, agruparlos o pasar a una alternativa de R12. Más límites (Help "Attribute-Based Pricing Limits"): valores numéricos con `.0`, sin picklist Booleano, solo atributos de la clasificación directa del producto, sin atributos con contexto de bundle sobrescrito.
+
+**R12 · Nunca entregar un diseño que no calce en Revenue Cloud.** Para **cada requisito** del usuario, antes de entregar, decidir y declarar su vía de implementación:
+1. **ESTÁNDAR**: lo soporta RLM tal cual, con cita de la Help o del kit (y revisados sus artículos de límites/consideraciones).
+2. **ESTÁNDAR A VALIDAR**: encaja con una limitación conocida o un matiz; se declara el matiz y la prueba de validación.
+3. **CUSTOM REAL**: RLM no lo hace de forma estándar. Se ofrece un diseño custom **construido con piezas reales de la plataforma** (expression sets / pricing procedures, decision tables, context definitions, constraint models, flows, Apex, campos o objetos propios, etc.), indicando qué objetos y elementos se tocan, el esfuerzo y el impacto en lo existente.
+Está **prohibido** (a) inventar objetos, campos o valores para que el requisito "quepa", (b) dar por soportado algo sin haber leído su artículo, (c) esconder una limitación en una nota. Si un requisito no es estándar, se dice en la primera página y se ofrece la opción estándar más cercana **y** el diseño custom real, con sus pros y contras, para que decida el usuario. Si no se puede garantizar ninguna vía, se dice "no verificado" y no se carga.
+
 ## 3. Tabla de verificación (obligatoria en cada entrega)
 
 | Objeto | Campo / valor | Valor usado | Clase (DOC / DERIVADO / SUPUESTO) | Referencia (artículo Help o fichero del kit) |
@@ -85,11 +98,16 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 | Tipo de ajuste por importe | `AdjustmentAmount` | `Amount` (valor de picklist del objeto, confirmado por el IDE; el parámetro `adjustmentType` del Business API usa minúsculas: `percentage`/`amount`/`override`) | Help "Create Attribute Based Adjustments" (Percentage / Amount / Override) y `pricing-business-apis-v68.md`; la capitalización del picklist se valida con describe |
 | Estrategia de resto de la proration policy | "Last pricing period" | `AddToLast` | El kit solo da la etiqueta de UI ("primer o último periodo"); el valor de API lo confirmó el IDE (DERIVADO hasta tener fuente) |
 | Restricción de valores de picklist | lista de permitidos | exclusiones (`AttrPicklistExcludedValue`) | Help PCM "Include or Exclude Picklist Values" |
+| Duración del contrato | un selling model por duración | un selling model por tipo+plazo+unidad, reutilizando los existentes; la duración va en la línea | Error de la org (duplicado) y modelo de selling models |
+| Regla de ajuste con varios atributos | ajustes independientes sumados | una regla por combinación, con condición por atributo | Help "Calculate Attribute-Based Discounts" y "Create Attribute Based Adjustments" |
 
 Otros fallos del incidente por corregir en el diseño: moneda parametrizada, clasificaciones de producto, fecha de inicio de los ajustes, programas de ajuste predefinidos, alta de valores de `Product2.Family`.
 
 ## 5. Checklist de pre-entrega
 
+- [ ] Viabilidad por requisito: cada uno marcado ESTÁNDAR / ESTÁNDAR A VALIDAR / CUSTOM REAL con cita; ningún requisito sin vía (R12)
+- [ ] Selling models reutilizados o únicos por tipo+plazo+unidad (R10)
+- [ ] Reglas de ajuste: condiciones sobre todos los atributos de precio y combinaciones contadas (R11)
 - [ ] `rlm-skill` consultado antes de diseñar: SKILL.md → sub-skills → artículos Help, citados en la tabla de la sección 3 (Regla cero)
 - [ ] Artículos de Help de cada objeto leídos (R9)
 - [ ] Atributos vía clasificaciones y exclusiones (R3)

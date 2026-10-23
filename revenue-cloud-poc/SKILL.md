@@ -33,7 +33,7 @@ bajo qué condiciones?"**, no "¿cómo gusta esto al cliente?". Antes de usarla,
   indica "no disponible" y **todo lo técnico se marca `SUPUESTO`**: el diseño no se presenta como
   validado.
 - **`references/reglas-modelado-catalogo-rlm.md`** — reglas obligatorias de modelado (Regla cero,
-  R1–R9), checklist de pre-entrega y correcciones conocidas de nombres y valores de API. Léelo antes
+  R1–R12), checklist de pre-entrega y correcciones conocidas de nombres y valores de API. Léelo antes
   de diseñar y antes de entregar.
 
 ## FASE 0 — Intake unificado (antes de decidir DEMO / POC / Migración)
@@ -108,6 +108,10 @@ Antes de especificar un componente, aplica la Regla cero de `references/reglas-m
 (consultar `rlm-skill`). Cada objeto, campo y valor de picklist de la especificación debe ser el nombre
 y valor de API reales (nunca la etiqueta de la UI ni un nombre inventado) y queda registrado en la
 tabla **3.1** del manifiesto con su clase (`DOC` / `DERIVADO` / `SUPUESTO`) y su referencia.
+**Nunca se entrega un diseño que no calce en Revenue Cloud (R12):** cada requisito se clasifica en la
+tabla **3.2** como `ESTÁNDAR`, `ESTÁNDAR A VALIDAR` o `CUSTOM REAL`, tras leer el artículo de Help y
+sus límites. Si no se puede de forma estándar, se ofrece un diseño custom real (con piezas reales de
+la plataforma) junto a la opción estándar más cercana; no se inventan objetos, campos ni valores.
 
 Igual que en `nespon-brief-to-demo`: tabla de componentes con nivel 🟢/🔵/🟠 y responsable
 IA / IA+Revisión / Persona (`references/ia-vs-persona.md`), tareas de persona con ruta, valores,
@@ -174,7 +178,7 @@ no si la hipótesis se cumple).
 |---|---|
 | `references/manifiesto-necesidades.md` | Fase 0: formato exacto del manifiesto de intake |
 | `references/manifiesto-poc.md` | 1.2–1.6: formato exacto del manifiesto de POC |
-| `references/reglas-modelado-catalogo-rlm.md` | Siempre antes de diseñar y de entregar: Regla cero, R1–R9, checklist, valores de API |
+| `references/reglas-modelado-catalogo-rlm.md` | Siempre antes de diseñar y de entregar: Regla cero, R1–R12 (viabilidad estándar vs custom real), checklist, valores de API |
 | `references/informe-viabilidad.md` | Fase 3: formato del informe de resultado |
 | (de `nespon-brief-to-demo`) `references/ia-vs-persona.md`, `impacto.md`, `datos-demo.md` | 1.4–1.5 |
 | (de `nespon-demo-builder`) `references/nubes/revenue-cloud.md`, `ejecucion-en-org.md` | diseño y Fase 3 |
