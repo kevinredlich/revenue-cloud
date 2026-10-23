@@ -32,7 +32,7 @@ revenue-cloud-poc/
 ├── references/
 │   ├── manifiesto-necesidades.md             # formato exacto de MANIFIESTO-NECESIDADES.md (Fase 0)
 │   ├── manifiesto-poc.md                     # formato exacto de MANIFIESTO-POC.md (Fase 1)
-│   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R9, checklist y valores de API
+│   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R14, checklist y valores de API
 │   └── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
 ├── assets/
 │   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo completo y válido (Bodegas Altiplano)
@@ -226,7 +226,7 @@ python3 scripts/scan_to_poc.py ../sample-scan.json --cliente "Cliente de prueba"
     --modalidad poc --out ejemplos/poc-prueba-scan/MANIFIESTO-POC.md
 ```
 El segundo comando genera un **pre-borrador**: no pasará `validate_manifest_poc.py` hasta
-completar a mano las secciones 3-8 (componentes, datos, orden, supuestos).
+completar a mano las secciones 3-8 (componentes, tablas 3.1–3.3 de verificación de API, viabilidad y decisiones de diseño, datos, orden, supuestos).
 
 ### 4. Prueba conversacional completa (Claude Code o Claude Desktop/Projects)
 

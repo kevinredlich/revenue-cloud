@@ -17,6 +17,7 @@ Regla cero (references/reglas-modelado-catalogo-rlm.md): exige constancia de que
 ('Fuentes consultadas'), la tabla 3.1 de verificación de nombres y valores de API (Clase DOC/DERIVADO/
 SUPUESTO, con referencia) y rechaza valores de API conocidos como incorrectos (Month, Year,
 AdjustmentAmount...). Sin ellos: AVISO en validación de diseño, ERROR con --gate.
+R12/R13: exige la tabla 3.2 (vía de cada requisito) y la 3.3 (decisiones con alternativas comparadas).
 Sale con 1 si hay errores.
 """
 import re
@@ -27,6 +28,7 @@ NIVEL = {"🟢", "🔵", "🟠"}
 ORIGEN = {"Estándar SF", "Estándar RLM", "Custom object", "N/A"}
 ESTADO = {"Pendiente", "Hecho", "Bloqueado", "Persona pendiente"}
 CLASE = {"DOC", "DERIVADO", "SUPUESTO"}
+VIA = {"ESTÁNDAR", "ESTÁNDAR A VALIDAR", "CUSTOM REAL"}
 # Valores que en esta skill se han escrito mal antes (etiqueta de UI o valor inventado) -> valor correcto.
 # Fuente: references/reglas-modelado-catalogo-rlm.md, sección 4. Solo se detectan entre `backticks`.
 BAD_API = {"Month": "Months", "Year": "Annual", "AdjustmentAmount": "Amount",
@@ -47,6 +49,14 @@ def rows(text, prefix):
         if cells and re.fullmatch(prefix + r"-\d+", cells[0]):
             out.append(cells)
     return out
+
+
+def origen_custom_hint(text):
+    """True si algún componente CMP declara Origen 'Custom object'."""
+    for r in rows(text, "CMP"):
+        if len(r) >= 5 and r[4] == "Custom object":
+            return True
+    return False
 
 
 def section(text, title_start):
@@ -113,13 +123,68 @@ def main(path, gate):
     if clases["SUPUESTO"] and not re.search(r"SUPUESTO|Supuesto", section(text, "7.")):
         W.append(f"3.1 tiene {clases['SUPUESTO']} SUPUESTO(s) que no se declaran en la sección 7 con su consulta de validación")
 
+    # Sección 3.2: viabilidad por requisito (R12: nunca entregar un diseño que no calce en RLM)
+    via = section(text, "3.2")
+    vias = {v: 0 for v in VIA}
+    for line in via.splitlines():
+        s = line.strip()
+        if not s.startswith("|"):
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        if len(cells) < 4 or cells[0].lower() == "requisito" or re.fullmatch(r"[-: ]+", cells[0]):
+            continue
+        req, v, ref, det = cells[:4]
+        if v not in VIA:
+            E.append(f"3.2 {req}: Vía '{v}' no válida (ESTÁNDAR | ESTÁNDAR A VALIDAR | CUSTOM REAL)")
+            continue
+        vias[v] += 1
+        if v in ("ESTÁNDAR", "ESTÁNDAR A VALIDAR") and ref in ("—", "-", ""):
+            E.append(f"3.2 {req}: {v} sin referencia (artículo de Help o fichero del kit, incluidos sus límites)")
+        if v in ("ESTÁNDAR A VALIDAR", "CUSTOM REAL") and det in ("—", "-", ""):
+            E.append(f"3.2 {req}: {v} sin matiz/prueba o sin diseño custom real (objetos reales, esfuerzo, impacto)")
+        if v == "CUSTOM REAL" and not re.search(r"alternativa", det, re.I):
+            W.append(f"3.2 {req}: CUSTOM REAL sin 'Alternativa estándar' más cercana (R12: ofrecer ambas)")
+    if not via.strip():
+        W.append("Falta '## 3.2 Viabilidad por requisito' (R12: cada requisito con vía ESTÁNDAR / ESTÁNDAR A VALIDAR / CUSTOM REAL)")
+        if gate:
+            E.append("PUERTA: falta la sección 3.2 de viabilidad por requisito")
+    elif sum(vias.values()) == 0:
+        W.append("3.2 no tiene filas: declara la vía de implementación de cada requisito")
+
+    # Sección 3.3: decisiones de diseño (R13: mejor alternativa, no la primera)
+    dec = section(text, "3.3")
+    n_dec = 0
+    for line in dec.splitlines():
+        s = line.strip()
+        if not s.startswith("|"):
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        if len(cells) < 4 or cells[0].lower() == "decisión" or re.fullmatch(r"[-: ]+", cells[0]):
+            continue
+        n_dec += 1
+        d, elegida, descartadas, motivo = cells[:4]
+        if descartadas in ("—", "-", "") or motivo in ("—", "-", ""):
+            E.append(f"3.3 {d}: falta alternativa descartada o motivo (R13: comparar al menos dos alternativas reales)")
+    necesita_33 = vias["ESTÁNDAR A VALIDAR"] + vias["CUSTOM REAL"] > 0
+    if not dec.strip():
+        if necesita_33:
+            E.append("Falta '## 3.3 Decisiones de diseño' (obligatoria con filas ESTÁNDAR A VALIDAR o CUSTOM REAL en 3.2)")
+        else:
+            W.append("Falta '## 3.3 Decisiones de diseño' (R13: alternativas comparadas y mejor elegida)")
+        if gate:
+            E.append("PUERTA: falta la sección 3.3 de decisiones de diseño")
+
+    # R12: todo componente 'Custom object' debe tener una fila CUSTOM REAL en 3.2
+    if origen_custom_hint(text) and vias["CUSTOM REAL"] == 0:
+        E.append("Hay componentes con Origen 'Custom object' pero ninguna fila CUSTOM REAL en 3.2 (R12: justificar el custom con diseño real)")
+
     nec = rows(text, "NEC")
     nec_ids = {r[0] for r in nec}
     if not nec:
         W.append("No hay necesidades/dudas de origen (NEC-n)")
     for r in nec:
-        if len(r) < 3 or r[2] not in ("Brief", "Supuesto"):
-            W.append(f"{r[0]}: Origen debería ser 'Brief' o 'Supuesto'")
+        if len(r) < 3 or r[2] not in ("Brief", "Supuesto", "Scan CPQ Scout"):
+            W.append(f"{r[0]}: Origen debería ser 'Brief', 'Supuesto' o 'Scan CPQ Scout'")
 
     hip = rows(text, "HIP")
     hip_ids = {r[0] for r in hip}
@@ -234,7 +299,9 @@ def main(path, gate):
           f"🟢 {lvl['🟢']} · 🔵 {lvl['🔵']} · 🟠 {lvl['🟠']} · "
           f"Estándar SF {origen_count['Estándar SF']} · Estándar RLM {origen_count['Estándar RLM']} · "
           f"Custom object {origen_count['Custom object']} · N/A {origen_count['N/A']} · "
-          f"API: DOC {clases['DOC']} · DERIVADO {clases['DERIVADO']} · SUPUESTO {clases['SUPUESTO']}")
+          f"API: DOC {clases['DOC']} · DERIVADO {clases['DERIVADO']} · SUPUESTO {clases['SUPUESTO']} · "
+          f"Vía: ESTÁNDAR {vias['ESTÁNDAR']} · A VALIDAR {vias['ESTÁNDAR A VALIDAR']} · CUSTOM REAL {vias['CUSTOM REAL']} · "
+          f"Decisiones 3.3: {n_dec}")
     for w in W:
         print("AVISO  ", w)
     for e in E:

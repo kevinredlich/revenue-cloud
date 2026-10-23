@@ -254,10 +254,10 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
         hip_lines.append(
             f"| HIP-{h} | ¿El mecanismo de `{row.get('sbqq_object', '?')}` "
             f"({row.get('notes', 'sin notas del scan')}) tiene equivalente estándar en RLM "
-            f"(`{row.get('rca_equivalent', '?')}`) sin desarrollo a medida? | NEC-1 | "
+            f"(`{row.get('rca_equivalent', '?')}`) o requiere un diseño custom real? | NEC-1 | "
             f"Se reproduce el comportamiento observado en origen usando solo configuración estándar "
             f"de {row.get('rca_equivalent', '?')} | Si no hay equivalente estándar, queda NO VALIDADA "
-            f"y se documenta si hace falta desarrollo o rediseño de proceso |"
+            f"y se documenta en 3.2 como CUSTOM REAL con el mejor diseño (R12/R13) o rediseño de proceso |"
         )
         exp_lines.append(
             f"| EXP-{h} | Configurar `{row.get('rca_equivalent', '?')}` para reproducir "
@@ -309,8 +309,9 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
         exp_lines.append("| EXP-1 | <completar> | HIP-1 | <completar> | <completar> | <completar> |")
 
     total_cmp_placeholder = (
-        "| CMP-1 | EXP-1 | <nombre> | <Tipo> | <especificación suficiente para construir sin "
-        "preguntar> | 🟢/🔵/🟠 | IA/IA+Revisión/Persona | <motivo si no es IA> | S/M/L | Pendiente |"
+        "| CMP-1 | EXP-1 | <nombre> | <Tipo> | Estándar SF/Estándar RLM/Custom object/N/A | "
+        "<especificación suficiente para construir sin preguntar> | 🟢/🔵/🟠 | "
+        "IA/IA+Revisión/Persona | <motivo si no es IA> | S/M/L | Pendiente |"
     )
 
     hdr_reparto = "IA 0 (0%) · IA+Revisión 0 · Persona 0"
@@ -323,6 +324,7 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
 **Cliente:** {cliente} · **Sector:** {sector} · **Zona fiscal:** {zona_fiscal}
 **Nube ancla:** Revenue Cloud (RLM) · **Nubes de apoyo:** — · **Org objetivo:** {org_objetivo}
 **Incertidumbre:** Migración de Salesforce CPQ a Revenue Cloud — ver hipótesis por mecanismo detectado
+**Fuentes consultadas (rlm-skill):** <completar: sub-skills y artículos de Help 264 consultados, o "no disponible">
 **Restricciones del SE:** <completar>
 **Reparto:** {hdr_reparto} · **Niveles:** {hdr_niveles}
 
@@ -352,9 +354,29 @@ equivalente estándar en Revenue Cloud sin desarrollo a medida.
 
 ## 3. Componentes
 <!-- PLANTILLA: completar un componente por cada paso EXP-n antes de validar. -->
-| ID | Paso | Componente | Tipo | Especificación | Nivel | Responsable | Motivo | Tamaño | Estado |
-|----|------|------------|------|----------------|-------|-------------|--------|--------|--------|
+| ID | Paso | Componente | Tipo | Origen | Especificación | Nivel | Responsable | Motivo | Tamaño | Estado |
+|----|------|------------|------|--------|----------------|-------|-------------|--------|--------|--------|
 {total_cmp_placeholder}
+
+## 3.2 Viabilidad por requisito
+<!-- PLANTILLA (R12): una fila por requisito/hipótesis. Vía = ESTÁNDAR | ESTÁNDAR A VALIDAR | CUSTOM REAL.
+     Leer antes el artículo de Help 264 y sus límites vía rlm-skill. CUSTOM REAL = diseño con piezas
+     reales de la plataforma + 'Alternativa estándar' más cercana. -->
+| Requisito | Vía | Referencia | Matiz / prueba o diseño custom real |
+|-----------|-----|------------|--------------------------------------|
+| <completar> | <ESTÁNDAR / ESTÁNDAR A VALIDAR / CUSTOM REAL> | <artículo Help o fichero del kit> | <completar> |
+
+## 3.3 Decisiones de diseño (mejor alternativa)
+<!-- PLANTILLA (R13): comparar al menos dos alternativas reales y elegir la mejor. -->
+| Decisión | Alternativa elegida | Alternativas descartadas | Motivo (encaje RLM, jerarquía, coherencia, mantenimiento, esfuerzo) |
+|----------|---------------------|---------------------------|----------------------------------------------------------------------|
+| <completar> | <completar> | <completar> | <completar> |
+
+## 3.1 Verificación de nombres y valores de API
+<!-- PLANTILLA (Regla cero): un registro por cada objeto, campo o valor de API usado. Clase DOC | DERIVADO | SUPUESTO. -->
+| Objeto | Campo / valor | Valor usado | Clase | Referencia |
+|--------|---------------|-------------|-------|------------|
+| <completar> | <completar> | <completar> | <DOC / DERIVADO / SUPUESTO> | <fichero del kit o artículo de Help> |
 
 ## 4. Tareas de persona
 <!-- PLANTILLA: un bloque "### CMP-n — <nombre>" por cada componente con Responsable = Persona. -->

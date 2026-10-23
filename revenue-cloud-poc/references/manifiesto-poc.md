@@ -41,6 +41,16 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 | CMP-2 | EXP-2 | Activar Revenue Cloud | Setup | N/A | Provisión/licencia en la org | 🟢 | Persona | Requiere licencia/provisión | S | Pendiente |
 | CMP-3 | EXP-2 | <objeto a medida> | CustomObject__c | Custom object | <qué guarda y por qué no hay estándar que lo cubra, según lo verificado contra la documentación oficial / rlm-skill> | 🟠 | IA | Sin equivalente estándar verificado | M | Pendiente |
 
+## 3.2 Viabilidad por requisito
+| Requisito | Vía | Referencia | Matiz / prueba o diseño custom real |
+|-----------|-----|------------|--------------------------------------|
+| <requisito del cliente> | ESTÁNDAR | `salesforce-help/264/help/<área>.md` (artículo y su sección de límites) | — |
+
+## 3.3 Decisiones de diseño (mejor alternativa)
+| Decisión | Alternativa elegida | Alternativas descartadas | Motivo (encaje RLM, jerarquía, coherencia, mantenimiento, esfuerzo) |
+|----------|---------------------|---------------------------|----------------------------------------------------------------------|
+| <p. ej. precio según duración> | <la elegida> | <al menos otra real> | <por qué es la mejor> |
+
 ## 3.1 Verificación de nombres y valores de API
 | Objeto | Campo / valor | Valor usado | Clase | Referencia |
 |--------|---------------|-------------|-------|------------|
@@ -65,6 +75,18 @@ añadida):
   kit; indica el ejemplo) · **SUPUESTO** (no respaldado; se declara también en la sección 7 con su
   consulta de validación). `Referencia` es obligatoria en DOC y DERIVADO (fichero del kit o artículo
   de Help). Nunca se escribe la etiqueta de la UI ni un nombre inventado como valor de API.
+- **Sección 3.2** (obligatoria, R12): una fila por requisito, con su vía: **ESTÁNDAR** (lo soporta RLM
+  tal cual; referencia al artículo y a sus límites) · **ESTÁNDAR A VALIDAR** (encaja con un matiz
+  o limitación; se declara el matiz y la prueba) · **CUSTOM REAL** (RLM no lo hace de forma estándar;
+  se describe un diseño custom con piezas reales de la plataforma —expression sets, decision tables,
+  context definitions, constraint models, flows, Apex, objetos o campos propios—, esfuerzo e impacto, y
+  se ofrece junto a la opción estándar más cercana). Prohibido inventar objetos, campos o valores
+  para que un requisito "quepa". Sin vía verificada, el requisito no se carga.
+- **Sección 3.3** (obligatoria, R13): una fila por decisión de diseño no trivial, con la alternativa
+  elegida, **al menos una descartada** y el motivo según los criterios de R13 (encaje con RLM,
+  jerarquía estándar > configuración > declarativo > código > objeto propio, coherencia con el
+  resto del modelo, mantenimiento, esfuerzo). Obligatoria si hay filas `ESTÁNDAR A VALIDAR` o
+  `CUSTOM REAL` en 3.2. Un diseño custom es válido cuando es la mejor opción real y está justificado.
 - `Nivel`: 🟢 default/config · 🔵 automatización o custom declarativo · 🟠 código.
 - `Responsable`: `IA` | `IA+Revisión` | `Persona` (criterios en `ia-vs-persona.md`).
 - `Motivo`: obligatorio si el responsable no es IA o el nivel es 🟠.

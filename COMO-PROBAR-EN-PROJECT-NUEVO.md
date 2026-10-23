@@ -14,7 +14,7 @@ revenue-cloud-poc/
 ├── references/
 │   ├── manifiesto-necesidades.md             # formato de MANIFIESTO-NECESIDADES.md (Fase 0)
 │   ├── manifiesto-poc.md                     # formato de MANIFIESTO-POC.md (Fase 1)
-│   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R9, checklist y valores de API
+│   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R14, checklist y valores de API
 │   └── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
 ├── assets/
 │   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo válido (Bodegas Altiplano) — ya pasa el validador
