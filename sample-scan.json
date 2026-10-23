@@ -1,0 +1,77 @@
+{
+  "scan_id": "scan-sample-0001",
+  "scanned_at": "2026-10-23T10:00:00Z",
+  "org": {
+    "org_id": "00D000000000SAMPLE",
+    "org_name": "Cliente de prueba (sandbox)"
+  },
+  "scores": {
+    "overall": 42,
+    "risk_level": "medium"
+  },
+  "catalog": {
+    "total_products": 180,
+    "bundles": 12
+  },
+  "transactions": {
+    "total_quotes": 950
+  },
+  "pricing": {
+    "price_rules_with_apex": 2,
+    "qcp_scripts": 1
+  },
+  "apex": {
+    "apex_triggers_on_sbqq": 3,
+    "apex_classes_referencing_sbqq": 5
+  },
+  "inventory": [
+    {
+      "sbqq_object": "SBQQ__Quote__c",
+      "record_count": 950,
+      "rca_equivalent": "Quote",
+      "migration_type": "Directa",
+      "risk": "low",
+      "notes": "Mapeo 1:1, sin lógica custom detectada"
+    },
+    {
+      "sbqq_object": "SBQQ__QuoteLine__c",
+      "record_count": 4200,
+      "rca_equivalent": "QuoteLineItem",
+      "migration_type": "Directa",
+      "risk": "low",
+      "notes": "Mapeo 1:1"
+    },
+    {
+      "sbqq_object": "SBQQ__ProductOption__c",
+      "record_count": 310,
+      "rca_equivalent": "ProductRelationship",
+      "migration_type": "Rediseño",
+      "risk": "medium",
+      "notes": "Jerarquía de bundles usa reglas de opción no triviales; requiere revisar equivalencia con Product Relationship Type en RLM"
+    },
+    {
+      "sbqq_object": "SBQQ__PriceRule__c",
+      "record_count": 18,
+      "rca_equivalent": "PricingRule / DecisionTable",
+      "migration_type": "Rediseño",
+      "risk": "medium",
+      "notes": "2 price rules invocan Apex (lookup de coste externo); el resto son condiciones estándar"
+    },
+    {
+      "sbqq_object": "SBQQ__DiscountSchedule__c",
+      "record_count": 6,
+      "rca_equivalent": "PriceAdjustmentSchedule",
+      "migration_type": "Directa",
+      "risk": "low",
+      "notes": "Tramos simples por cantidad, sin código"
+    },
+    {
+      "sbqq_object": "SBQQ__QuoteProcess__c (QCP personalizado)",
+      "record_count": 1,
+      "rca_equivalent": "Sin equivalente estándar identificado",
+      "migration_type": "Reescritura",
+      "risk": "high",
+      "notes": "Script QCP calcula margen combinando coste de un sistema externo (no visible en la org); no hay integración documentada equivalente en RLM"
+    }
+  ]
+}
