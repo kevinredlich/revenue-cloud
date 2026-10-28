@@ -33,19 +33,26 @@ revenue-cloud-poc/
 │   ├── manifiesto-necesidades.md             # formato exacto de MANIFIESTO-NECESIDADES.md (Fase 0)
 │   ├── manifiesto-poc.md                     # formato exacto de MANIFIESTO-POC.md (Fase 1)
 │   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R14, checklist y valores de API
-│   └── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
+│   ├── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
+│   └── api-correcciones.json                 # valores de API incorrectos conocidos (los lee el validador)
 ├── assets/
-│   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo completo y válido (Bodegas Altiplano)
+│   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo de diseño en BORRADOR (Bodegas Altiplano)
+│   ├── ejemplo-MANIFIESTO-POC-APROBADO.md    # el mismo, aprobado con --approve (pasa --gate)
 │   └── ejemplo-INFORME-VIABILIDAD.md
 ├── ejemplos/
-│   └── poc-prosegur-cpq/                     # caso real completo (FASE 0 + FASE 1 APROBADO)
-└── scripts/
-    ├── scan_to_poc.py                        # genera manifiestos a partir de un scan de CPQ Scout
-    └── validate_manifest_poc.py              # valida MANIFIESTO-POC.md (diseño y puerta de ejecución)
+│   ├── poc-prueba-scan/                      # salida de scan_to_poc.py sobre ../sample-scan.json
+│   └── legacy-v1/poc-prosegur-cpq/           # caso real anterior al endurecimiento (NO pasa --gate)
+├── scripts/
+│   ├── scan_to_poc.py                        # genera manifiestos a partir de un scan de CPQ Scout
+│   ├── validate_manifest_poc.py              # valida, aprueba (--approve) y abre la puerta (--gate)
+│   ├── compare_results.py                    # compara casos esperados con observados (Fase 3)
+│   └── check_deps.py                         # comprueba Python y Salesforce CLI
+└── tests/                                    # python3 -m unittest discover -s tests -t .
 ```
 
-Requiere Python 3 (sin dependencias de terceros — solo `argparse`, `json`, `re`, `datetime` de
-librería estándar). Para la Fase 3 real sobre una org hace falta además `sf` (Salesforce CLI).
+Requiere Python 3.9 o superior (sin dependencias de terceros: solo biblioteca estándar). Para la
+Fase 3 real sobre una org hace falta además `sf` (Salesforce CLI) con la org ya autenticada;
+`python3 scripts/check_deps.py` lo comprueba.
 
 ## Flujo completo
 
@@ -116,29 +123,39 @@ Formato exacto de cada sección: `references/manifiesto-poc.md`. Ejemplo complet
 ### FASE 2 — Revisión del SE
 
 El SE revisa el `MANIFIESTO-POC.md`, puede pedir cambios (nueva versión + entrada en el
-"Registro de cambios"), y aprueba cambiando la cabecera a:
+"Registro de cambios") y aprueba con el validador, que exige un manifiesto sin errores en modo
+estricto y escribe la cabecera por él:
+
+```bash
+python3 scripts/validate_manifest_poc.py poc-<cliente>/MANIFIESTO-POC.md --approve "Nombre Apellido"
+```
 
 ```
 **Estado de revisión:** APROBADO
-**Revisado por:** <nombre> · **Fecha de aprobación:** <fecha>
+**Revisado por:** Nombre Apellido · **Fecha de aprobación:** 2026-10-28
+**Hash de aprobación:** sha256:<64 hex>
 ```
 
-Esta línea literal (`Estado de revisión: APROBADO`) es la única señal que el resto del flujo
-reconoce como aprobación — no basta con decirlo en el chat sin escribirla en el documento.
+El hash cubre todo el contenido salvo esas tres líneas: si alguien edita el manifiesto después,
+`--gate` falla hasta que se vuelva a aprobar. Editar a mano `APROBADO` ya no abre la puerta. El
+hash detecta modificaciones; no prueba la identidad de quien aprobó.
 
 ### FASE 3 — Ejecución del experimento (solo con una org real conectada)
 
 1. **Puerta obligatoria** antes de tocar nada:
    ```bash
-   python3 scripts/validate_manifest_poc.py poc-<cliente>/MANIFIESTO-POC.md --gate
+   python3 scripts/validate_manifest_poc.py poc-<cliente>/MANIFIESTO-POC.md --gate --org <alias>
    ```
-   Sin `Estado de revisión: APROBADO`, el validador falla y **no se construye nada en la org**.
+   Sin `APROBADO` con hash válido, o si `Org objetivo` no declara sandbox/scratch/SDO ni contiene el
+   alias, el validador falla y **no se construye nada en la org**. Es una comprobación de lo que el
+   manifiesto declara, no una verificación contra la org real.
 2. Pre-flight: confirmar la org y las licencias de Revenue Cloud/Asset Lifecycle Management.
 3. Construir los componentes en el orden de la sección 6 del manifiesto, respetando el reparto
    IA / IA+Revisión / Persona.
 4. Cargar los datos de prueba (`fill_data.py` → `sf data import tree`, o el flujo equivalente).
 5. Ejecutar cada paso del experimento y registrar el resultado real observado frente al esperado,
-   con su evidencia (consulta SOQL, captura, log).
+   con su evidencia (consulta SOQL, captura, log). Los `CASO-n` se exportan con `--export-cases` y
+   `scripts/compare_results.py` los compara con lo observado.
 6. Clasificar cada hipótesis y generar `INFORME-VIABILIDAD.md` (formato en
    `references/informe-viabilidad.md`):
    - 🟢 **VALIDADA** — evidencia suficiente de cumplimiento.
@@ -175,49 +192,41 @@ especificación, qué puede usar tal cual y qué tiene que construir desde cero.
 
 ## Cómo probarlo
 
-### 1. Validador sobre el ejemplo incluido (sin tocar ninguna org)
+### 1. Validador sobre los ejemplos incluidos (sin tocar ninguna org)
 
 ```bash
 cd revenue-cloud-poc
 python3 scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC.md
-# → debe terminar en "OK" (0 errores)
+# → "OK" (0 errores), BORRADOR
+python3 scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC-APROBADO.md --gate
+# → "OK": APROBADO, hash válido y casos de prueba con valor esperado
 python3 scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC.md --gate
-# → también "OK": el ejemplo ya está "Estado de revisión: APROBADO"
+# → falla: el borrador no está aprobado
+python3 -m unittest discover -s tests -t .
 ```
 
-### 2. Caso real de referencia (Prosegur Alarms, POC "penalización por baja anticipada")
+### 2. Caso real anterior (Prosegur Alarms) — `ejemplos/legacy-v1/`
 
-Incluido en `ejemplos/poc-prosegur-cpq/`. Ya ejecutado una vez como prueba de extremo a extremo de
-esta skill (FASE 0 → FASE 1 → FASE 2), sin FASE 3 por no haber org conectada en esa sesión. Sirve
-como referencia de qué debe salir:
+Se conserva sin tocar como muestra de un manifiesto de la primera versión del formato. **No pasa
+el validador actual** (no tiene `Fuentes consultadas`, ni las tablas 3.1 y 3.2, ni hash, y conserva
+un marcador `<completar>`). Sirve para ver qué falla un manifiesto sin evidencia técnica, no como
+modelo a seguir:
 
 ```bash
-python3 scripts/validate_manifest_poc.py ejemplos/poc-prosegur-cpq/MANIFIESTO-POC.md --gate
+python3 scripts/validate_manifest_poc.py ejemplos/legacy-v1/poc-prosegur-cpq/MANIFIESTO-POC.md --gate
 ```
 
-Salida esperada (resumen):
-```
-Estado: APROBADO · Necesidades 1 · Hipótesis 1 · Pasos 3 · Componentes 7 ·
-IA 5 (71%) · IA+Revisión 1 · Persona 1 · 🟢 3 · 🔵 4 · 🟠 0 ·
-Estándar SF 3 · Estándar RLM 3 · Custom object 0 · N/A 1
-OK
-```
-
-Puntos a verificar al reproducirlo:
-- `MANIFIESTO-NECESIDADES.md` separa las 25 necesidades reales del RFQ (hoja "CPQ") de las 178
-  filas de la hoja "Aspectos Generales" (esas son una respuesta a RFP, no necesidades de negocio
-  — quedan explícitamente fuera en la sección 5 del manifiesto de necesidades).
-- La incertidumbre elegida (NEC-17, penalización por baja anticipada) está marcada 🔴 porque falta
-  la fórmula de cálculo real del cliente — el manifiesto la sustituye por un supuesto explícito
-  (50% del valor restante) y lo marca como tal en la sección 7, no como dato confirmado.
-- Ningún componente quedó como `Custom object`: la hipótesis se diseñó para probarse solo con
-  mecanismos declarativos (Price Rules/Decision Tables), sin Apex, tal como pide la cabecera
-  `Restricciones del SE`.
+Puntos de interés de su contenido (no de su validación):
+- Separa las 25 necesidades reales del RFQ de las 178 filas de "Aspectos Generales" (respuesta a
+  RFP, no necesidades de negocio).
+- La incertidumbre (NEC-17, penalización por baja anticipada) está en 🔴 por falta de fórmula
+  real del cliente; el manifiesto la sustituye por un supuesto explícito (50% del valor restante).
+- Ningún componente es `Custom object`: la hipótesis se diseñó solo con mecanismos declarativos.
 
 ### 3. Probar la generación desde un scan sintético (sin CPQ Scout real)
 
-Incluido `sample-scan.json` en la raíz del paquete (ver más abajo). Para probar `scan_to_poc.py`
-sin un scan real:
+Incluido `sample-scan.json` en la raíz del repositorio. Para probar `scan_to_poc.py` sin un scan
+real (no sobrescribe un fichero existente salvo `--force`):
 
 ```bash
 python3 scripts/scan_to_poc.py ../sample-scan.json --cliente "Cliente de prueba" \
@@ -226,7 +235,7 @@ python3 scripts/scan_to_poc.py ../sample-scan.json --cliente "Cliente de prueba"
     --modalidad poc --out ejemplos/poc-prueba-scan/MANIFIESTO-POC.md
 ```
 El segundo comando genera un **pre-borrador**: no pasará `validate_manifest_poc.py` hasta
-completar a mano las secciones 3-8 (componentes, tablas 3.1–3.3 de verificación de API, viabilidad y decisiones de diseño, datos, orden, supuestos).
+completar a mano las secciones 3-8 (componentes, tablas 3.1–3.3 de verificación de API, viabilidad y decisiones de diseño, datos, orden, supuestos). Los `NEC-n` del pre-borrador coinciden con los del manifiesto de necesidades generado del mismo scan, y cada `HIP-n` cita su `NEC-n`.
 
 ### 4. Prueba conversacional completa (Claude Code o Claude Desktop/Projects)
 
@@ -248,22 +257,24 @@ Dos capas, no solo una:
 1. **La skill misma**: nunca invoca una escritura real en Salesforce (`sf` CLI, o los endpoints
    de CPQ Scout) sin que el `MANIFIESTO-POC.md` correspondiente tenga
    `Estado de revisión: APROBADO`.
-2. **CPQ Scout** (si se usa como motor de ejecución): los endpoints `/api/migration/accelerate` y
-   `/api/migration/accelerate/batch/execute` exigen un parámetro `manifest_path`, abren ese
-   fichero y responden `403` si no existe o no contiene el marcador `Estado de revisión:
-   APROBADO`. Esto se probó de forma aislada (no contra un `uvicorn` corriendo ni una org real) —
-   si vas a depender de este gate en producción, verifícalo una vez contra un servidor real antes
-   de confiar en él sin más.
+2. **CPQ Scout** (si se usa como motor de ejecución): según su documentación, los endpoints
+   `/api/migration/accelerate` y `/api/migration/accelerate/batch/execute` exigen `manifest_path` y
+   responden `403` si el fichero no existe o no contiene `Estado de revisión: APROBADO`. Ese control
+   no se ha verificado desde este repositorio y solo mira el texto, no el hash: ejecuta siempre
+   antes `validate_manifest_poc.py --gate`, y verifica el gate contra un servidor real antes de
+   depender de él.
 
 ## Limitaciones conocidas
 
-- El validador solo acepta `Origen` de una `NEC-n` como `Brief` o `Supuesto`; un manifiesto
-  generado desde un scan usa `Scan CPQ Scout`, lo que produce un `AVISO` (no bloqueante) en vez de
-  pasar limpio. Pendiente de ajustar si se usa `scan_to_poc.py` con frecuencia.
-- `scan_to_poc.py --modalidad poc` solo genera un pre-borrador (secciones 1-2); las secciones 3-8
-  siempre requieren completarse a mano antes de validar.
-- El gate de CPQ Scout (`manifest_path` + `require_approved_manifest`) no se ha probado todavía
-  contra un servidor real ni una org real.
+- `scan_to_poc.py --modalidad poc` solo genera un pre-borrador (secciones 1-2 y plantillas); las
+  secciones 3-8 siempre requieren completarse a mano antes de validar.
+- El hash de aprobación detecta ediciones posteriores pero no autentica a quien aprueba; para eso
+  haría falta una firma externa (por ejemplo, un commit firmado o la aprobación de un PR).
+- `--org` comprueba lo que el manifiesto declara; no consulta la org. La verificación real
+  (`sf org display`, pre-vuelo con `describe`) la hace quien ejecuta la Fase 3.
+- El gate de CPQ Scout no se ha probado contra un servidor real ni una org real.
+- Las reglas de modelado (`references/reglas-modelado-catalogo-rlm.md`) mezclan reglas y notas de
+  post-mortem; conviene separarlas en el futuro.
 
 ## Entregables por fase
 

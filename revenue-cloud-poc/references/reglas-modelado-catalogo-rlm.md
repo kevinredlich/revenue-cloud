@@ -58,7 +58,7 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 
 ## 2. Reglas
 
-**R1 · Jerarquía de fuentes.** (1) Documentación oficial obtenida **a través de `rlm-skill` (Regla cero)**: Help 264 y `rlm-skill` (modelo de datos, `references/apis/*`, dataset de referencia `references/enablement/master/qb-scenario-reference.md`). (2) Si la doc solo da la etiqueta de UI, derivar el valor de API **siguiendo los ejemplos del kit** y marcarlo DERIVADO. (3) La org solo valida después; si el IDE corrige algo, se anota en la sección 4. Mi memoria, el "suele ser así" y las etiquetas de UI no son fuente. Sección 6 = dónde buscar cada tipo de valor.
+**R1 · Jerarquía de fuentes.** (1) Documentación oficial obtenida **a través de `rlm-skill` (Regla cero)**: Help 264 y `rlm-skill` (modelo de datos, `references/apis/*`, dataset de referencia `references/enablement/master/qb-scenario-reference.md`). (2) Si la doc solo da la etiqueta de UI, derivar el valor de API **siguiendo los ejemplos del kit** y marcarlo DERIVADO. Una fuente externa (referencia de objetos de Salesforce, una copia de terceros) solo puede dar un DERIVADO si se contrasta **cada nombre con la etiqueta de la Help** y se cita esa contrastación; sin ella es SUPUESTO, y nunca DOC. (3) La org solo valida después; si el IDE corrige algo, se anota en la sección 4. Mi memoria, el "suele ser así" y las etiquetas de UI no son fuente. Sección 6 = dónde buscar cada tipo de valor.
 
 **R2 · Diseño portable, prerrequisitos explícitos.** No se bloquea el diseño por falta de datos de la org ni se asumen valores ajenos al origen. Lo dependiente de la org se **parametriza** con el valor por defecto que respalda la documentación, y se entrega una sección **"Prerrequisitos de la org"** con (a) los altas necesarios (p. ej. valores de `Product2.Family`, monedas, programas de ajuste si no existen) y (b) consultas read-only de pre-flight que el usuario/IDE ejecuta antes de cargar (existencia de selling models, `PriceAdjustmentSchedule`, clasificaciones, valores de picklist, moneda corporativa).
 
@@ -68,7 +68,7 @@ El IDE con acceso a la org rechazó el documento. Causas y regla que las evita:
 
 **R5 · Nombres y valores de API.** Cada objeto, campo y valor de picklist de un fichero de carga debe ser el de API según la documentación, nunca la etiqueta de la UI ni un nombre inventado. Si no existe un campo para algo, se dice y se propone alternativa; no se inventa la columna. Todo queda en la tabla de la sección 3.
 
-**R6 · Clasificación de cada dato y supuestos en la primera página.** Cada nombre/valor/decisión se etiqueta **DOC** (literal en Help/kit, con referencia), **DERIVADO** (deducido de ejemplos del kit, con el ejemplo) o **SUPUESTO** (no respaldado; hay que minimizarlos eligiendo la alternativa que sí respalda la doc). La tabla de supuestos va en la **primera página** del documento, no al final. El documento es cargable si todo está en DOC/DERIVADO y el pre-flight de R2 está incluido; cada SUPUESTO restante se declara como riesgo con su consulta de validación.
+**R6 · Clasificación de cada dato y supuestos en la primera página.** Cada nombre/valor/decisión se etiqueta **DOC** (literal en Help/kit, con referencia), **DERIVADO** (deducido de ejemplos del kit o de una fuente externa contrastada con la Help; la referencia nombra el ejemplo o la contrastación, y si es externa se confirma con describe en el pre-vuelo de la sección 7 del manifiesto) o **SUPUESTO** (no respaldado; hay que minimizarlos eligiendo la alternativa que sí respalda la doc). La tabla de supuestos va en la **primera página** del documento, no al final. El documento es cargable si todo está en DOC/DERIVADO y el pre-flight de R2 está incluido; cada SUPUESTO restante se declara como riesgo con su consulta de validación.
 
 **R7 · La org valida, no diseña.** Cuando el IDE o la org corrige un valor, se corrige el documento, se anota en la sección 4 y se revisa por qué la documentación no lo preveía, para ajustar la fuente de R1.
 
@@ -103,9 +103,12 @@ Está **prohibido** (a) inventar objetos, campos o valores para que el requisito
 | Unidad de plazo anual | `Year` | `Annual` | Kit: ídem ("1 Annual"; también `Quarterly`, `Semi-Annual`) |
 | Tipo de ajuste por importe | `AdjustmentAmount` | `Amount` (valor de picklist del objeto, confirmado por el IDE; el parámetro `adjustmentType` del Business API usa minúsculas: `percentage`/`amount`/`override`) | Help "Create Attribute Based Adjustments" (Percentage / Amount / Override) y `pricing-business-apis-v68.md`; la capitalización del picklist se valida con describe |
 | Estrategia de resto de la proration policy | "Last pricing period" | `AddToLast` | El kit solo da la etiqueta de UI ("primer o último periodo"); el valor de API lo confirmó el IDE (DERIVADO hasta tener fuente) |
-| Restricción de valores de picklist | lista de permitidos | exclusiones (`AttrPicklistExcludedValue`) | Help PCM "Include or Exclude Picklist Values" |
+| Restricción de valores de picklist | lista de permitidos (`ProductAttributeAllowedValue`, que no existe) | exclusiones (`AttrPicklistExcludedValue`) | Help PCM "Include or Exclude Picklist Values" |
+| Selling model de componente en un bundle configurable | informar `ParentSellingModelId`/`ChildSellingModelId` | dejarlos vacíos | Help PCM, campos adicionales del componente: "Don't select a component selling model for configurable bundles" |
 | Duración del contrato | un selling model por duración | un selling model por tipo+plazo+unidad, reutilizando los existentes; la duración va en la línea | Error de la org (duplicado) y modelo de selling models |
 | Regla de ajuste con varios atributos | ajustes independientes sumados | una regla por combinación, con condición por atributo | Help "Calculate Attribute-Based Discounts" y "Create Attribute Based Adjustments" |
+
+Los valores de la columna «Incorrecto» que son tokens de API (`Month`, `Year`, `AdjustmentAmount`, "Last pricing period", `ProductAttributeAllowedValue`) están también en `api-correcciones.json`, que lee el validador para rechazarlos si aparecen entre `backticks` en un manifiesto. Al añadir una corrección aquí, añádela allí (hay un test que comprueba que ambos coinciden).
 
 Otros fallos del incidente por corregir en el diseño: moneda parametrizada, clasificaciones de producto, fecha de inicio de los ajustes, programas de ajuste predefinidos, alta de valores de `Product2.Family`.
 
@@ -138,4 +141,25 @@ Otros fallos del incidente por corregir en el diseño: moneda parametrizada, cla
 | Valores de API de pricing (`adjustmentType`, `effectiveFrom`…) | `references/apis/pricing-business-apis-v68.md` |
 | Valores de PCM, prorrateo (`ProrationPolicyType`, `ArePartialPeriodsAllowed`) | `references/apis/pcm-business-apis-reference.md`, `references/apis/product-discovery-apis-reference.md` |
 | Valores de picklist añadidos por release | `references/schema-diff/262-vs-264-diff.md` |
+| Nombres de API de campos que el kit no trae (p. ej. cardinalidad de bundles) | Referencia de objetos de Salesforce. Las páginas de developer.salesforce.com son SPA y WebFetch no las lee: buscar con WebSearch una copia de la página del objeto y leerla. Contrastar **cada nombre con la etiqueta de la Help** y marcar DERIVADO citando esa contrastación; confirmar con describe en el pre-vuelo (no bloquea el diseño). Sin contrastar con la Help es SUPUESTO; nunca DOC |
 | Procedimiento y campos obligatorios de cada objeto | `salesforce-help/264/help/<área>.md` (buscar con `grep -n "^title:"`) |
+
+## 7. Nombres de API verificados (bundles configurables)
+
+Obtenidos de la referencia de objetos de Salesforce y contrastados con las etiquetas de la Help 264 ("Manage Local Cardinality", "Add Components to a Configurable Product Bundle"). Clase DERIVADO; confirmar con describe.
+
+| Objeto | Etiqueta de la Help | Nombre de API |
+|---|---|---|
+| ProductRelatedComponent | Require this component | `IsComponentRequired` |
+| ProductRelatedComponent | Include component by default | `IsDefaultComponent` |
+| ProductRelatedComponent | Allow quantity changes | `IsQuantityEditable` |
+| ProductRelatedComponent | Price includes component | `DoesBundlePriceIncludeChild` |
+| ProductRelatedComponent | Quantity Scaling Method (None, Constant, Proportional) | `QuantityScaleMethod` |
+| ProductRelatedComponent | Min Quantity / Max Quantity / Quantity | `MinQuantity` / `MaxQuantity` / `Quantity` |
+| ProductRelatedComponent | Group | `ProductComponentGroupId` |
+| ProductRelatedComponent | Child product / Parent product | `ChildProductId` / `ParentProductId` |
+| ProductComponentGroup | Min Number of Components / Max Number of Components | `MinBundleComponents` / `MaxBundleComponents` |
+| ProductComponentGroup | Group Name | `Name` |
+| Product2 | Configure During Sale | `ConfigureDuringSale` |
+
+Reglas de cardinalidad de grupo que valida la Help ("Manage Validations for Product Bundles", "Group Cardinality Examples"): los productos de un grupo deben ser al menos el mínimo del grupo; los componentes obligatorios del grupo no pueden superar su máximo.

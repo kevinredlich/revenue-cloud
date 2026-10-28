@@ -87,11 +87,12 @@ El endpoint `/api/migration/accelerate` (y `/api/migration/accelerate/batch/exec
 escriben en una org real (no una org de demo ficticia). Nunca se invocan como parte de esta skill
 sin que el `MANIFIESTO-POC.md` correspondiente esté `APROBADO` por el SE — el gate de
 `nespon-brief-to-demo` (pensado para orgs de demo) se extiende aquí a "ninguna escritura real sin
-manifiesto aprobado", sea el mecanismo `sf CLI` o la propia API de CPQ Scout. CPQ Scout ahora exige
-`manifest_path` en esas dos llamadas cuando escribe de verdad y rechaza con 403 si el fichero no
-existe o no contiene `Estado de revisión: APROBADO` — pero quien use esta skill sigue
-responsabilizándose de pasar la ruta correcta; si no puede verificar que el gate está conectado,
-lo dice explícitamente en vez de asumirlo.
+manifiesto aprobado", sea el mecanismo `sf CLI` o la propia API de CPQ Scout. Según la documentación de
+CPQ Scout, esas dos llamadas exigen `manifest_path` y rechazan con 403 si el fichero no existe o no
+contiene `Estado de revisión: APROBADO`; ese control no se ha verificado desde este repositorio y
+solo mira el texto, no el hash. Quien use esta skill ejecuta antes `validate_manifest_poc.py --gate`
+y, si no puede verificar que el gate de CPQ Scout está conectado, lo dice explícitamente en vez de
+asumirlo.
 
 ## FASE 1 — Diseño (no toca la org)
 
@@ -137,19 +138,34 @@ tenga los datos exactos que el experimento necesita, no "contar una historia". M
 ```bash
 python3 <skill-dir>/scripts/validate_manifest_poc.py poc-<slug>/MANIFIESTO-POC.md
 ```
-Corrige los errores. Deja `Estado de revisión: BORRADOR` y presenta un resumen corto: hipótesis,
-pasos, % de componentes IA, tareas de persona, supuestos. **Para aquí. No construyas nada.**
+Corrige los errores. Los AVISOS de calidad (sin pre-vuelo, sin casos de prueba con valor esperado,
+marcadores `<completar>`, fuente externa sin confirmar) pasan a ERROR en `--strict`, `--gate` y
+`--approve`: se corrigen antes de pedir la aprobación. Deja `Estado de revisión: BORRADOR` y presenta
+un resumen corto: hipótesis, pasos, % de componentes IA, tareas de persona, supuestos. **Para aquí.
+No construyas nada.**
+
+Los valores de API que ya se han escrito mal alguna vez (etiqueta de UI en vez de valor de API)
+están en `references/api-correcciones.json`; el validador los rechaza si aparecen entre `backticks`.
 
 Formato exacto: `references/manifiesto-poc.md`. Ejemplo: `assets/ejemplo-MANIFIESTO-POC.md`.
 
 ## FASE 2 — Revisión (el SE)
 Igual que en `nespon-brief-to-demo`: el SE revisa, puede pedir cambios (nueva versión con registro
-de cambios), y aprueba poniendo `Estado de revisión: APROBADO` con su nombre, o confirmándolo en la
-conversación.
+de cambios), y aprueba **solo mediante el validador**, que comprueba el manifiesto en modo estricto y escribe estado,
+nombre, fecha y un hash sha256 del contenido:
+```bash
+python3 <skill-dir>/scripts/validate_manifest_poc.py poc-<slug>/MANIFIESTO-POC.md --approve "Nombre Apellido"
+```
+Si el SE aprueba en la conversación, el agente ejecuta ese comando con el nombre que el SE da; nunca
+inventa el nombre ni edita a mano la línea `Estado de revisión`. Cualquier cambio posterior al
+contenido invalida el hash y el manifiesto vuelve a requerir `--approve`. El hash detecta ediciones,
+no prueba quién aprobó.
 
 ## FASE 3 — Ejecución del experimento (solo con org y sf CLI — Claude Code / Vibes)
 
-1. **Puerta:** `validate_manifest_poc.py --gate`; sin `APROBADO` no se toca la org.
+1. **Puerta:** `validate_manifest_poc.py --gate --org <alias>`; sin `APROBADO`, sin hash válido o
+   con una `Org objetivo` que no sea sandbox/scratch/SDO y no coincida con el alias, no se toca la
+   org. Antes, `scripts/check_deps.py --require-sf` confirma que el entorno puede ejecutar.
 2. Pre-flight de `nespon-demo-builder` (org confirmada, licencias de Revenue Cloud/RLM) y
    checklist de pre-entrega de `references/reglas-modelado-catalogo-rlm.md`: la org valida lo
    diseñado (describe, consultas de pre-flight) pero no sustituye a la documentación; cada
@@ -163,11 +179,14 @@ conversación.
    bundle (por ejemplo: simular el pricing o crear una cotización y comparar el precio exacto con el
    calculado en el diseño). Una carga sin errores no prueba que el motor aplique lo cargado.
 5. **Ejecuta cada paso del experimento** y registra el resultado real observado frente al esperado,
-   con su evidencia (consulta, captura, log).
+   con su evidencia (consulta, captura, log). Los casos `CASO-n` se exportan con
+   `validate_manifest_poc.py --export-cases casos.json`, los observados se anotan en un JSON
+   `{"CASO-1": "…"}` y `scripts/compare_results.py casos.json resultados.json` da la comparación
+   exacta (un caso sin ejecutar nunca cuenta como bueno).
 6. Clasifica cada hipótesis (ver abajo) y genera `INFORME-VIABILIDAD.md`
    (`references/informe-viabilidad.md`).
 
-Si no hay org conectada, la Fase 3 no se ejecuta: entrega el diseño con estado **PREPARADA, NO
+Si no hay org conectada, o `sf` no está instalado, la Fase 3 no se ejecuta: entrega el diseño con estado **PREPARADA, NO
 EJECUTADA** y nunca afirmes un resultado de hipótesis sin haberla ejecutado.
 
 ## Resultado de cada hipótesis
@@ -196,6 +215,7 @@ no si la hipótesis se cumple).
 | `references/manifiesto-poc.md` | 1.2–1.6: formato exacto del manifiesto de POC |
 | `references/reglas-modelado-catalogo-rlm.md` | Siempre antes de diseñar y de entregar: Regla cero, R1–R14 (viabilidad estándar vs custom real), checklist, valores de API |
 | `references/informe-viabilidad.md` | Fase 3: formato del informe de resultado |
+| `references/api-correcciones.json` | Valores de API incorrectos conocidos que el validador rechaza |
 | (de `nespon-brief-to-demo`) `references/ia-vs-persona.md`, `impacto.md`, `datos-demo.md` | 1.4–1.5 |
 | (de `nespon-demo-builder`) `references/nubes/revenue-cloud.md`, `ejecucion-en-org.md` | diseño y Fase 3 |
 | (de `rlm-skill`, obligatoria) `SKILL.md` (enrutador a 13 sub-skills + 1.131 artículos de Help) | diseñar y verificar cualquier hipótesis o componente técnico antes de darlo por viable |
@@ -203,4 +223,6 @@ no si la hipótesis se cumple).
 | Script | Para qué |
 |---|---|
 | `scripts/scan_to_poc.py` | Fase 0 (`--modalidad intake`, por defecto) y Fase 1 con origen scan (`--modalidad poc`) |
-| `scripts/validate_manifest_poc.py` | Valida `MANIFIESTO-POC.md` antes de entregarlo y antes de ejecutar |
+| `scripts/validate_manifest_poc.py` | Valida `MANIFIESTO-POC.md`; `--strict`, `--gate [--org]`, `--approve`, `--json`, `--export-cases` |
+| `scripts/compare_results.py` | Fase 3: compara los `CASO-n` esperados con los observados |
+| `scripts/check_deps.py` | Fase 3: comprueba Python y Salesforce CLI antes de ejecutar |
