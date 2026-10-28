@@ -104,6 +104,7 @@ Está **prohibido** (a) inventar objetos, campos o valores para que el requisito
 | Tipo de ajuste por importe | `AdjustmentAmount` | `Amount` (valor de picklist del objeto, confirmado por el IDE; el parámetro `adjustmentType` del Business API usa minúsculas: `percentage`/`amount`/`override`) | Help "Create Attribute Based Adjustments" (Percentage / Amount / Override) y `pricing-business-apis-v68.md`; la capitalización del picklist se valida con describe |
 | Estrategia de resto de la proration policy | "Last pricing period" | `AddToLast` | El kit solo da la etiqueta de UI ("primer o último periodo"); el valor de API lo confirmó el IDE (DERIVADO hasta tener fuente) |
 | Restricción de valores de picklist | lista de permitidos | exclusiones (`AttrPicklistExcludedValue`) | Help PCM "Include or Exclude Picklist Values" |
+| Selling model de componente en un bundle configurable | informar `ParentSellingModelId`/`ChildSellingModelId` | dejarlos vacíos | Help PCM, campos adicionales del componente: "Don't select a component selling model for configurable bundles" |
 | Duración del contrato | un selling model por duración | un selling model por tipo+plazo+unidad, reutilizando los existentes; la duración va en la línea | Error de la org (duplicado) y modelo de selling models |
 | Regla de ajuste con varios atributos | ajustes independientes sumados | una regla por combinación, con condición por atributo | Help "Calculate Attribute-Based Discounts" y "Create Attribute Based Adjustments" |
 
@@ -138,4 +139,25 @@ Otros fallos del incidente por corregir en el diseño: moneda parametrizada, cla
 | Valores de API de pricing (`adjustmentType`, `effectiveFrom`…) | `references/apis/pricing-business-apis-v68.md` |
 | Valores de PCM, prorrateo (`ProrationPolicyType`, `ArePartialPeriodsAllowed`) | `references/apis/pcm-business-apis-reference.md`, `references/apis/product-discovery-apis-reference.md` |
 | Valores de picklist añadidos por release | `references/schema-diff/262-vs-264-diff.md` |
+| Nombres de API de campos que el kit no trae (p. ej. cardinalidad de bundles) | Referencia de objetos de Salesforce. Las páginas de developer.salesforce.com son SPA y WebFetch no las lee: buscar con WebSearch una copia de la página del objeto (p. ej. soft-builder.com) y fetch de esa copia. Contrastar **cada nombre con la etiqueta de la Help** y marcar DERIVADO con la fuente; confirmar con describe en el pre-vuelo (no bloquea el diseño). Nunca SUPUESTO si se puede derivar así |
 | Procedimiento y campos obligatorios de cada objeto | `salesforce-help/264/help/<área>.md` (buscar con `grep -n "^title:"`) |
+
+## 7. Nombres de API verificados (bundles configurables)
+
+Obtenidos de la referencia de objetos de Salesforce y contrastados con las etiquetas de la Help 264 ("Manage Local Cardinality", "Add Components to a Configurable Product Bundle"). Clase DERIVADO; confirmar con describe.
+
+| Objeto | Etiqueta de la Help | Nombre de API |
+|---|---|---|
+| ProductRelatedComponent | Require this component | `IsComponentRequired` |
+| ProductRelatedComponent | Include component by default | `IsDefaultComponent` |
+| ProductRelatedComponent | Allow quantity changes | `IsQuantityEditable` |
+| ProductRelatedComponent | Price includes component | `DoesBundlePriceIncludeChild` |
+| ProductRelatedComponent | Quantity Scaling Method (None, Constant, Proportional) | `QuantityScaleMethod` |
+| ProductRelatedComponent | Min Quantity / Max Quantity / Quantity | `MinQuantity` / `MaxQuantity` / `Quantity` |
+| ProductRelatedComponent | Group | `ProductComponentGroupId` |
+| ProductRelatedComponent | Child product / Parent product | `ChildProductId` / `ParentProductId` |
+| ProductComponentGroup | Min Number of Components / Max Number of Components | `MinBundleComponents` / `MaxBundleComponents` |
+| ProductComponentGroup | Group Name | `Name` |
+| Product2 | Configure During Sale | `ConfigureDuringSale` |
+
+Reglas de cardinalidad de grupo que valida la Help ("Manage Validations for Product Bundles", "Group Cardinality Examples"): los productos de un grupo deben ser al menos el mínimo del grupo; los componentes obligatorios del grupo no pueden superar su máximo.
