@@ -2,7 +2,8 @@
 
 El validador (`scripts/validate_manifest_poc.py`) depende de estos encabezados, prefijos de ID y
 columnas. Español de España; nombres técnicos y API names en inglés. Tamaño en S/M/L, no horas.
-Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
+Ejemplos completos: `assets/ejemplo-MANIFIESTO-POC.md` (borrador) y `assets/ejemplo-MANIFIESTO-POC-APROBADO.md`.
+Orden de las secciones 3: 3 Componentes → 3.1 Verificación de API → 3.2 Viabilidad → 3.3 Decisiones (la verificación se hace antes de decidir la vía).
 
 ```markdown
 # MANIFIESTO DE DESARROLLO (POC) — <Cliente o tema> — v<N>
@@ -14,6 +15,7 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 **Incertidumbre:** <la pregunta técnica o de negocio que hay que responder, en una frase>
 **Fuentes consultadas (rlm-skill):** <sub-skills y artículos de Help 264 consultados> | no disponible
 **Restricciones del SE:** <literal> | Ninguna
+**Supuestos clave:** <los supuestos que condicionan el diseño, en la primera página (R6)>
 **Reparto:** IA <n> (<x>%) · IA+Revisión <n> · Persona <n> · **Niveles:** 🟢 <n> · 🔵 <n> · 🟠 <n>
 
 ## 1. Contexto y necesidad de origen
@@ -41,6 +43,10 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 | CMP-2 | EXP-2 | Activar Revenue Cloud | Setup | N/A | Provisión/licencia en la org | 🟢 | Persona | Requiere licencia/provisión | S | Pendiente |
 | CMP-3 | EXP-2 | <objeto a medida> | CustomObject__c | Custom object | <qué guarda y por qué no hay estándar que lo cubra, según lo verificado contra la documentación oficial / rlm-skill> | 🟠 | IA | Sin equivalente estándar verificado | M | Pendiente |
 
+## 3.1 Verificación de nombres y valores de API
+| Objeto | Campo / valor | Valor usado | Clase | Referencia |
+|--------|---------------|-------------|-------|------------|
+| PriceAdjustmentTier | LowerBound | `LowerBound` | DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` |
 ## 3.2 Viabilidad por requisito
 | Requisito | Vía | Referencia | Matiz / prueba o diseño custom real |
 |-----------|-----|------------|--------------------------------------|
@@ -51,10 +57,6 @@ Ejemplo completo en `assets/ejemplo-MANIFIESTO-POC.md`.
 |----------|---------------------|---------------------------|----------------------------------------------------------------------|
 | <p. ej. precio según duración> | <la elegida> | <al menos otra real> | <por qué es la mejor> |
 
-## 3.1 Verificación de nombres y valores de API
-| Objeto | Campo / valor | Valor usado | Clase | Referencia |
-|--------|---------------|-------------|-------|------------|
-| PriceAdjustmentTier | LowerBound | `LowerBound` | DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` |
 ```
 Reglas de la tabla (idénticas a `nespon-brief-to-demo/references/manifiesto.md`, con una columna
 añadida):
@@ -112,12 +114,24 @@ CMP-2 → CMP-1 → DAT-1 → ejecutar EXP-1 → ejecutar EXP-2
 
 ## 7. Supuestos y preguntas abiertas
 - Supuesto: …
+- Pre-vuelo (Prerrequisitos de la org, R2): altas necesarias y consultas de solo lectura (`describe`, selling models, moneda) antes de cargar
 - Pregunta para el SE: …
 
 ## 8. Registro de cambios
 - v1: versión inicial a partir del brief del <fecha>.
 ```
 
-Aprobación: el SE cambia `Estado de revisión` a `APROBADO` y rellena `Revisado por` y
-`Fecha de aprobación`. Sin eso la Fase 3 no arranca. La sección 9 (Resultado) la añade la Fase 3,
+### Casos de prueba (R14, obligatorios para aprobar)
+```markdown
+| ID | Caso | Entrada | Resultado esperado | Pasos |
+|----|------|---------|--------------------|-------|
+| CASO-1 | <combinación a probar> | <cantidad, atributos, fecha relativa TODAY±N> | <valor exacto esperado, p. ej. 103,00> | EXP-2 |
+```
+Cada hipótesis debe quedar cubierta por algún `CASO-n` con valor esperado. `validate_manifest_poc.py
+--export-cases` los exporta a JSON para `compare_results.py`.
+
+Aprobación: **no se edita a mano**. El SE (o el agente por orden suya) ejecuta
+`validate_manifest_poc.py M.md --approve "Nombre"`, que exige cero errores en modo estricto y escribe
+`Estado de revisión: APROBADO`, `Revisado por`, `Fecha de aprobación` y `Hash de aprobación`
+(sha256 del contenido sin esas líneas). Un cambio posterior invalida el hash. Sin eso la Fase 3 no arranca. La sección 9 (Resultado) la añade la Fase 3,
 no se incluye en el borrador porque todavía no hay evidencia.

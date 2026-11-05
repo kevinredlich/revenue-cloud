@@ -15,23 +15,28 @@ revenue-cloud-poc/
 │   ├── manifiesto-necesidades.md             # formato de MANIFIESTO-NECESIDADES.md (Fase 0)
 │   ├── manifiesto-poc.md                     # formato de MANIFIESTO-POC.md (Fase 1)
 │   ├── reglas-modelado-catalogo-rlm.md       # Regla cero (rlm-skill), R1-R14, checklist y valores de API
-│   └── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
+│   ├── informe-viabilidad.md                 # formato del informe de resultado (Fase 3)
+│   └── api-correcciones.json                 # valores de API incorrectos conocidos (los lee el validador)
 ├── assets/
-│   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo válido (Bodegas Altiplano) — ya pasa el validador
+│   ├── ejemplo-MANIFIESTO-POC.md             # ejemplo de diseño en BORRADOR (Bodegas Altiplano)
+│   ├── ejemplo-MANIFIESTO-POC-APROBADO.md    # el mismo, aprobado con --approve (pasa --gate)
 │   └── ejemplo-INFORME-VIABILIDAD.md
 ├── ejemplos/
-│   ├── poc-prosegur-cpq/                     # caso real completo: FASE 0 + FASE 1 APROBADO
-│   └── poc-prueba-scan/                      # generado aquí mismo desde sample-scan.json, de ejemplo
-└── scripts/
-    ├── scan_to_poc.py                        # genera manifiestos desde un scan de CPQ Scout
-    └── validate_manifest_poc.py              # valida MANIFIESTO-POC.md
+│   ├── legacy-v1/poc-prosegur-cpq/           # caso real anterior al endurecimiento; NO pasa --gate
+│   └── poc-prueba-scan/                      # generado desde sample-scan.json
+├── scripts/
+│   ├── scan_to_poc.py                        # genera manifiestos desde un scan de CPQ Scout
+│   ├── validate_manifest_poc.py              # valida, aprueba (--approve) y abre la puerta (--gate)
+│   ├── compare_results.py                    # compara casos esperados con observados
+│   └── check_deps.py                         # comprueba Python y Salesforce CLI
+└── tests/                                    # python3 -m unittest discover -s tests -t .
 
 sample-scan.json                              # scan sintético de prueba, para scan_to_poc.py
 ```
 
-Todo este contenido ya se validó antes de empaquetarlo: los dos ejemplos pasan
-`validate_manifest_poc.py` (y `--gate` donde corresponde), y `scan_to_poc.py` se corrió en los dos
-modos (`intake` y `poc`) sobre `sample-scan.json` sin errores de ejecución.
+La integridad del paquete la comprueba la suite de `tests/` (se ejecuta en CI con cada cambio):
+el ejemplo en borrador valida, el aprobado pasa `--gate`, el legacy falla `--gate`, y los scripts de
+escaneo generan los dos modos sin errores de ejecución y con la misma numeración NEC.
 
 ## Paso 1 — Crear el Project nuevo en claude.ai
 
@@ -76,8 +81,10 @@ Dentro del Project nuevo, en una conversación:
 5. Pide que lo valide — si tienes ejecución de código, corriendo
    `validate_manifest_poc.py`; si no, pidiéndole a Claude que revise manualmente cada regla del
    validador contra el documento que acaba de escribir.
-6. Simula la aprobación del SE y verifica que cambia la cabecera a
-   `Estado de revisión: APROBADO` con `Revisado por` y `Fecha de aprobación`.
+6. Simula la aprobación del SE y verifica que se hace con `validate_manifest_poc.py --approve
+   "Nombre"` (no editando la cabecera a mano) y que quedan `Estado de revisión: APROBADO`,
+   `Revisado por`, `Fecha de aprobación` y `Hash de aprobación`. Edita después cualquier frase del
+   manifiesto y comprueba que `--gate` falla hasta volver a aprobar.
 7. Pide la Fase 3 sin org conectada y verifica que **se detiene explícitamente** diciendo
    "PREPARADA, NO EJECUTADA" — nunca debe inventar un resultado de hipótesis sin haber corrido el
    experimento.
@@ -89,23 +96,29 @@ sesión), sube también `sample-scan.json` y reproduce exactamente lo que ya se 
 este paquete:
 
 ```bash
-# Validar el ejemplo incluido (debe dar "OK")
-python3 revenue-cloud-poc/scripts/validate_manifest_poc.py revenue-cloud-poc/assets/ejemplo-MANIFIESTO-POC.md
+cd revenue-cloud-poc
+# Suite completa
+python3 -m unittest discover -s tests -t .
 
-# Validar el caso real de Prosegur con la puerta de aprobación (debe dar "OK", está APROBADO)
-python3 revenue-cloud-poc/scripts/validate_manifest_poc.py revenue-cloud-poc/ejemplos/poc-prosegur-cpq/MANIFIESTO-POC.md --gate
+# Borrador de ejemplo: valida (OK) pero no pasa la puerta
+python3 scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC.md
+python3 scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC.md --gate     # falla: no aprobado
 
-# Generar el manifiesto de necesidades desde un scan sintético
-python3 revenue-cloud-poc/scripts/scan_to_poc.py sample-scan.json --cliente "Cliente de prueba" \
-    --out revenue-cloud-poc/ejemplos/poc-prueba-scan/MANIFIESTO-NECESIDADES.md
+# Ejemplo aprobado: pasa la puerta (hash válido)
+python3 scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC-APROBADO.md --gate
 
-# Generar el pre-borrador de POC desde el mismo scan (tras "confirmar" modalidad)
-python3 revenue-cloud-poc/scripts/scan_to_poc.py sample-scan.json --cliente "Cliente de prueba" \
-    --modalidad poc --out revenue-cloud-poc/ejemplos/poc-prueba-scan/MANIFIESTO-POC.md
+# Caso legacy: falla a propósito (sin Fuentes, sin tablas 3.1/3.2, sin hash, con <completar>)
+python3 scripts/validate_manifest_poc.py ejemplos/legacy-v1/poc-prosegur-cpq/MANIFIESTO-POC.md --gate
 
-# Confirmar que el pre-borrador NO pasa el validador todavía (comportamiento esperado:
-# salen 3 errores porque faltan las secciones 3-8, hay que completarlas a mano)
-python3 revenue-cloud-poc/scripts/validate_manifest_poc.py revenue-cloud-poc/ejemplos/poc-prueba-scan/MANIFIESTO-POC.md
+# Generar el manifiesto de necesidades y el pre-borrador desde un scan sintético
+# (no sobrescribe ficheros existentes sin --force)
+python3 scripts/scan_to_poc.py ../sample-scan.json --cliente "Cliente de prueba" --force \
+    --out ejemplos/poc-prueba-scan/MANIFIESTO-NECESIDADES.md
+python3 scripts/scan_to_poc.py ../sample-scan.json --cliente "Cliente de prueba" --force \
+    --modalidad poc --out ejemplos/poc-prueba-scan/MANIFIESTO-POC.md
+
+# El pre-borrador NO pasa el validador (esperado: hay que completar a mano secciones 3-8)
+python3 scripts/validate_manifest_poc.py ejemplos/poc-prueba-scan/MANIFIESTO-POC.md
 ```
 
 ## Qué NO vas a poder probar aquí (fuera de alcance de un Project aislado)

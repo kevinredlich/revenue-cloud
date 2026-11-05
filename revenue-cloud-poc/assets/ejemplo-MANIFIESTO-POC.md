@@ -7,7 +7,8 @@
 **Incertidumbre:** ¿El motor de pricing estándar de Revenue Cloud puede aplicar un descuento por volumen escalonado (no plano) sin desarrollo a medida?
 **Fuentes consultadas (rlm-skill):** `subskills/revenue-cloud-data-model/domains/pricing.md`; `references/apis/pricing-business-apis-v68.md`; Help 264 "Create Attribute Based Adjustments"
 **Restricciones del SE:** Solo mecanismos estándar de Pricing; nada de Apex para el cálculo
-**Reparto:** IA 5 (71%) · IA+Revisión 1 · Persona 1 · **Niveles:** 🟢 2 · 🔵 4 · 🟠 0
+**Supuestos clave:** La org tiene Revenue Cloud (RLM) provisionado; el tipo de ajuste `Percentage` se confirma con describe (sección 7); los tramos y el precio base son los del ejemplo
+**Reparto:** IA 5 (71%) · IA+Revisión 1 · Persona 1 · **Niveles:** 🟢 3 · 🔵 4 · 🟠 0
 
 ## 1. Contexto y necesidad de origen
 | ID | Necesidad / duda del cliente | Origen |
@@ -24,14 +25,14 @@
 
 | ID | Paso del experimento | Hipótesis | Entrada | Resultado esperado | Evidencia requerida |
 |----|------------------------|-----------|---------|----------------------|------------------------|
-| EXP-1 | Configurar Price Adjustment Schedule con 3 tramos (1-49 / 50-99 / 100+) sobre un producto de prueba | HIP-1 | Producto "Vino Reserva Caja 6u" con precio base 42 € | El schedule se guarda y aparece activo en el Price Book Entry | Captura del schedule activo en Setup |
+| EXP-1 | Configurar Price Adjustment Schedule con 3 tramos (1-49 / 50-99 / 100+) sobre un producto de prueba | HIP-1 | Producto "Vino Reserva Caja 6u" con precio base 42 (moneda de la org) | El schedule se guarda y aparece activo en el Price Book Entry | Captura del schedule activo en Setup |
 | EXP-2 | Generar una Quote Line de 150 unidades del producto de prueba | HIP-1 | Quote con el producto y cantidad 150 | El precio unitario de la línea cambia automáticamente al tramo 100+ | Quote Line con el precio por unidad aplicado, consulta SOQL del campo de precio |
-| EXP-3 | Comparar el total calculado por el sistema contra el cálculo manual del tramo 100+ | HIP-1 | Mismos datos que EXP-2 | El total coincide (±0,01 € por redondeo) | Captura con ambos cálculos lado a lado |
+| EXP-3 | Comparar el total calculado por el sistema contra el cálculo manual del tramo 100+ | HIP-1 | Mismos datos que EXP-2 | El total coincide (±0,01 por redondeo) | Captura con ambos cálculos lado a lado |
 
 ## 3. Componentes
 | ID | Paso | Componente | Tipo | Origen | Especificación | Nivel | Responsable | Motivo | Tamaño | Estado |
 |----|------|------------|------|--------|----------------|-------|-------------|--------|--------|--------|
-| CMP-1 | EXP-1 | Producto de prueba | Product2 | Estándar SF | "Vino Reserva Caja 6u", precio base 42 € | 🟢 | IA | — | S | Pendiente |
+| CMP-1 | EXP-1 | Producto de prueba | Product2 | Estándar SF | "Vino Reserva Caja 6u", precio base 42 (moneda de la org, sin fijar `CurrencyIsoCode`) | 🟢 | IA | — | S | Pendiente |
 | CMP-2 | EXP-1 | Tramos de descuento | PriceAdjustmentSchedule | Estándar RLM | Tipo: Cantidad; tramos 1-49 (0%), 50-99 (5%), 100+ (12%) | 🔵 | IA | — | M | Pendiente |
 | CMP-3 | EXP-1 | Verificar licencia Revenue Cloud | Setup | N/A | Comprobar PermissionSetLicense "Pricing" activo | 🟢 | Persona | Provisión/licencia, solo visible en Setup | S | Pendiente |
 | CMP-4 | EXP-2 | Quote de prueba | Quote | Estándar SF | Oportunidad y cuenta de prueba, Quote Line del producto CMP-1 | 🔵 | IA | — | S | Pendiente |
@@ -71,11 +72,20 @@ Spec: `datos/seed-spec.json` (generada con `fill_data.py`) · Qué representa ca
 |----|--------|-----------|---------------------------|-------|
 | DAT-1 | Account, Opportunity | 1 protagonista | Cuenta de prueba "Distribuidor Test SL" con una oportunidad abierta | EXP-2 |
 
+Casos de prueba con valor esperado (R14): precio unitario y total de la línea con el schedule de CMP-2 sobre el precio base 42.
+
+| ID | Caso | Entrada | Resultado esperado | Pasos |
+|----|------|---------|--------------------|-------|
+| CASO-1 | Tramo 1-49 (sin descuento) | Cantidad 30 | Precio unitario 42,00; total 1.260,00 | EXP-2, EXP-3 |
+| CASO-2 | Tramo 50-99 (5%) | Cantidad 75 | Precio unitario 39,90; total 2.992,50 | EXP-2, EXP-3 |
+| CASO-3 | Tramo 100+ (12%) | Cantidad 150 | Precio unitario 36,96; total 5.544,00 | EXP-2, EXP-3 |
+
 ## 6. Orden de construcción
 CMP-3 → CMP-7 → CMP-1 → CMP-2 → DAT-1 → CMP-4 → CMP-5 → CMP-6 → ejecutar EXP-1 → ejecutar EXP-2 → ejecutar EXP-3
 
 ## 7. Supuestos y preguntas abiertas
 - Supuesto: la org objetivo tiene Revenue Cloud (RLM) provisionado, no solo Sales Cloud con CPQ heredado.
+- Pre-vuelo (Prerrequisitos de la org, R2): consulta de solo lectura de `PermissionSetLicense` con Pricing activo y `describe` de `PriceAdjustmentTier` para confirmar la capitalización de `Percentage`; moneda corporativa de la org (el diseño no la fija).
 - Pregunta para el SE: ¿los tramos reales son los de este ejemplo o el cliente los ha definido en el brief?
 
 ## 8. Registro de cambios

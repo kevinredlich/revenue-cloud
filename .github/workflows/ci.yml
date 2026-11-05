@@ -1,0 +1,23 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Tests
+        working-directory: revenue-cloud-poc
+        run: python -m unittest discover -s tests -t .
+      - name: Ejemplos vigentes pasan la validación
+        working-directory: revenue-cloud-poc
+        run: |
+          python scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC.md --strict
+          python scripts/validate_manifest_poc.py assets/ejemplo-MANIFIESTO-POC-APROBADO.md --gate --org SDO
