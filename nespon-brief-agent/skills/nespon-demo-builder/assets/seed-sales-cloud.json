@@ -1,0 +1,331 @@
+{
+ "client_slug": "sales-cloud",
+ "objects": [
+  {
+   "sobject": "Account",
+   "records": [
+    {
+     "ref": "ACC1",
+     "Name": "Conservas del Segura SL",
+     "Industry": "Food & Beverage",
+     "BillingCity": "Murcia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC2",
+     "Name": "Hotel Brisa Mediterránea SA",
+     "Industry": "Hospitality",
+     "BillingCity": "Alicante",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC3",
+     "Name": "Muebles Levante SL",
+     "Industry": "Retail",
+     "BillingCity": "Valencia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC4",
+     "Name": "Clínica Dental Sonrisa SL",
+     "Industry": "Healthcare",
+     "BillingCity": "Madrid",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC5",
+     "Name": "Bodegas Altiplano SA",
+     "Industry": "Food & Beverage",
+     "BillingCity": "Jumilla",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC6",
+     "Name": "Gimnasios Activa SL",
+     "Industry": "Other",
+     "BillingCity": "Cartagena",
+     "BillingCountry": "Spain"
+    }
+   ]
+  },
+  {
+   "sobject": "Contact",
+   "records": [
+    {
+     "ref": "CON1",
+     "FirstName": "Nuria",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Jefe de Ventas",
+     "Email": "nuria.perez1@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON2",
+     "FirstName": "Marta",
+     "LastName": "Rubio",
+     "AccountId": "@ACC2",
+     "Title": "Directora de Marketing",
+     "Email": "marta.rubio2@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON3",
+     "FirstName": "Rocío",
+     "LastName": "Martínez",
+     "AccountId": "@ACC3",
+     "Title": "Responsable de Comunicación",
+     "Email": "rocio.martinez3@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON4",
+     "FirstName": "Javier",
+     "LastName": "López",
+     "AccountId": "@ACC4",
+     "Title": "Jefe de Ventas",
+     "Email": "javier.lopez4@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON5",
+     "FirstName": "Marta",
+     "LastName": "Díaz",
+     "AccountId": "@ACC5",
+     "Title": "Directora de Marketing",
+     "Email": "marta.diaz5@example.com",
+     "MailingCity": "Jumilla",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON6",
+     "FirstName": "Javier",
+     "LastName": "Sánchez",
+     "AccountId": "@ACC6",
+     "Title": "Responsable de Compras",
+     "Email": "javier.sanchez6@example.com",
+     "MailingCity": "Cartagena",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON9",
+     "FirstName": "Sergio",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Responsable de Comunicación",
+     "Email": "sergio.perez9@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON10",
+     "FirstName": "Rocío",
+     "LastName": "Navarro",
+     "AccountId": "@ACC2",
+     "Title": "Responsable de Comunicación",
+     "Email": "rocio.navarro10@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON11",
+     "FirstName": "Carlos",
+     "LastName": "Ruiz",
+     "AccountId": "@ACC3",
+     "Title": "Gerente",
+     "Email": "carlos.ruiz11@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON12",
+     "FirstName": "Hugo",
+     "LastName": "López",
+     "AccountId": "@ACC4",
+     "Title": "Responsable de Comunicación",
+     "Email": "hugo.lopez12@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON13",
+     "FirstName": "Iván",
+     "LastName": "Ruiz",
+     "AccountId": "@ACC5",
+     "Title": "Jefe de Ventas",
+     "Email": "ivan.ruiz13@example.com",
+     "MailingCity": "Jumilla",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON14",
+     "FirstName": "Nuria",
+     "LastName": "Molina",
+     "AccountId": "@ACC6",
+     "Title": "Responsable de Comunicación",
+     "Email": "nuria.molina14@example.com",
+     "MailingCity": "Cartagena",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    }
+   ]
+  },
+  {
+   "sobject": "Opportunity",
+   "records": [
+    {
+     "ref": "OPP1",
+     "Name": "Conservas del - Proyecto 1",
+     "AccountId": "@ACC1",
+     "StageName": "Prospecting",
+     "Amount": 31000,
+     "CloseDate": "TODAY+5",
+     "Stage_Entered_Date__c": "TODAY-2"
+    },
+    {
+     "ref": "OPP2",
+     "Name": "Hotel Brisa Mediterránea - Proyecto 2",
+     "AccountId": "@ACC2",
+     "StageName": "Qualification",
+     "Amount": 45000,
+     "CloseDate": "TODAY+7",
+     "Stage_Entered_Date__c": "TODAY-4"
+    },
+    {
+     "ref": "OPP3",
+     "Name": "Muebles Levante - Proyecto 3",
+     "AccountId": "@ACC3",
+     "StageName": "Needs Analysis",
+     "Amount": 24000,
+     "CloseDate": "TODAY+9",
+     "Stage_Entered_Date__c": "TODAY-6"
+    },
+    {
+     "ref": "OPP4",
+     "Name": "Clínica Dental - Proyecto 4",
+     "AccountId": "@ACC4",
+     "StageName": "Proposal/Price Quote",
+     "Amount": 45000,
+     "CloseDate": "TODAY+11",
+     "Stage_Entered_Date__c": "TODAY-8"
+    },
+    {
+     "ref": "OPP5",
+     "Name": "Bodegas Altiplano - Proyecto 5",
+     "AccountId": "@ACC5",
+     "StageName": "Negotiation/Review",
+     "Amount": 45000,
+     "CloseDate": "TODAY+13",
+     "Stage_Entered_Date__c": "TODAY-10"
+    },
+    {
+     "ref": "OPP6",
+     "Name": "Gimnasios Activa - Proyecto 6",
+     "AccountId": "@ACC6",
+     "StageName": "Prospecting",
+     "Amount": 24000,
+     "CloseDate": "TODAY+15",
+     "Stage_Entered_Date__c": "TODAY-12"
+    },
+    {
+     "ref": "OPP7",
+     "Name": "Conservas del - Proyecto 7",
+     "AccountId": "@ACC1",
+     "StageName": "Qualification",
+     "Amount": 18500,
+     "CloseDate": "TODAY+17",
+     "Stage_Entered_Date__c": "TODAY-14"
+    },
+    {
+     "ref": "OPP8",
+     "Name": "Hotel Brisa Mediterránea - Proyecto 8",
+     "AccountId": "@ACC2",
+     "StageName": "Needs Analysis",
+     "Amount": 45000,
+     "CloseDate": "TODAY+19",
+     "Stage_Entered_Date__c": "TODAY-16"
+    },
+    {
+     "ref": "OPP9",
+     "Name": "Muebles Levante - Proyecto 9",
+     "AccountId": "@ACC3",
+     "StageName": "Proposal/Price Quote",
+     "Amount": 45000,
+     "CloseDate": "TODAY+21",
+     "Stage_Entered_Date__c": "TODAY-18"
+    },
+    {
+     "ref": "OPP-R1",
+     "Name": "Conservas del Segura - Renovación anual",
+     "AccountId": "@ACC1",
+     "StageName": "Negotiation/Review",
+     "Amount": 85000,
+     "CloseDate": "TODAY+15",
+     "Stage_Entered_Date__c": "TODAY-45"
+    },
+    {
+     "ref": "OPP-R2",
+     "Name": "Hotel Brisa - Ampliación",
+     "AccountId": "@ACC2",
+     "StageName": "Proposal/Price Quote",
+     "Amount": 42000,
+     "CloseDate": "TODAY+15",
+     "Stage_Entered_Date__c": "TODAY-31"
+    },
+    {
+     "ref": "OPP-R3",
+     "Name": "Muebles Levante - Nuevo",
+     "AccountId": "@ACC3",
+     "StageName": "Qualification",
+     "Amount": 27500,
+     "CloseDate": "TODAY+15",
+     "Stage_Entered_Date__c": "TODAY-38"
+    }
+   ]
+  },
+  {
+   "sobject": "Lead",
+   "records": [
+    {
+     "ref": "LEAD1",
+     "FirstName": "Irene",
+     "LastName": "Castro",
+     "Company": "Frutas Huerta Viva SL",
+     "Title": "Gerente",
+     "Email": "irene.castro@example.com",
+     "LeadSource": "Web",
+     "Rating": "Hot",
+     "Status": "Working - Contacted",
+     "City": "Lorca"
+    },
+    {
+     "ref": "LEAD2",
+     "FirstName": "Álvaro",
+     "LastName": "Rubio",
+     "Company": "Transportes Costa Cálida SL",
+     "Title": "Director de Operaciones",
+     "Email": "alvaro.rubio@example.com",
+     "LeadSource": "Other",
+     "Rating": "Hot",
+     "Status": "Open - Not Contacted",
+     "City": "Cartagena"
+    }
+   ]
+  }
+ ]
+}
