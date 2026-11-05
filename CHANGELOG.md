@@ -2,6 +2,8 @@
 
 ## Sin publicar — endurecimiento del validador, trazabilidad y documentación
 
+- Ejemplo POC (Bodegas Altiplano) corregido tras cuatro pasadas del `rlm-verifier` (RECHAZADO, RECHAZADO, CON RESERVAS, CON RESERVAS); informe en `revenue-cloud-poc/assets/VERIFICACION-RLM.md` con las reservas pendientes para el SE. Ejemplo aprobado regenerado y tests actualizados (CI en verde).
+
 ### Validador (`validate_manifest_poc.py`)
 - `Fuentes consultadas (rlm-skill)`, 3.1 y 3.2 son ERROR siempre (antes solo con `--gate`); 3.3 es
   ERROR si hay filas `ESTÁNDAR A VALIDAR` o `CUSTOM REAL`.

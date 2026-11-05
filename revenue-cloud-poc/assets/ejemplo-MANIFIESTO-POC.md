@@ -6,6 +6,7 @@
 **Nube ancla:** Revenue Cloud (RLM) · **Nubes de apoyo:** — · **Org objetivo:** SDO con Revenue Cloud provisionado
 **Incertidumbre:** ¿El motor de pricing estándar de Revenue Cloud puede aplicar un descuento por volumen escalonado (no plano) sin desarrollo a medida?
 **Fuentes consultadas (rlm-skill):** `subskills/revenue-cloud-data-model/domains/pricing.md`; `subskills/pricing-wiring/guide.md`; `references/schema-diff/264-schema.json`; `references/apis/transaction-management-apis-reference.md`; `references/apis/pricing-business-apis-v68.md`; `references/revenue-cloud-permissions.md`; Help 264 "Create Price Adjustment Tiers for Volume Discounts" y "Volume and Tier Based Discounts"
+**Verificación de coherencia (rlm-verifier):** CON RESERVAS · 2026-11-05 · VERIFICACION-RLM.md
 **Restricciones del SE:** Solo mecanismos estándar de Pricing; nada de Apex para el cálculo
 **Supuestos clave:** La org tiene Revenue Cloud (RLM) provisionado; los valores `TierType` = `AdjustmentPercentage` y `AdjustmentMethod` = `Range` se confirman con describe en el pre-vuelo (sección 7); cómo se persiste el precio en la línea y el enlace del procedure con el plan son SUPUESTOS declarados en la sección 7; los tramos y el precio base son los del ejemplo
 **Reparto:** IA 8 (72%) · IA+Revisión 0 · Persona 3 · **Niveles:** 🟢 6 · 🔵 5 · 🟠 0

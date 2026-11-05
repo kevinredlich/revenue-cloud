@@ -95,19 +95,19 @@ class Evidencia(unittest.TestCase):
         self.assertTrue(any("3.2" in e for e in V.analyze(sin32)["E"]))
 
     def test_valor_de_api_incorrecto_en_backticks(self):
-        t = read(BORRADOR).replace("`Percentage`", "`AdjustmentAmount`", 1)
-        self.assertTrue(any("AdjustmentAmount" in e for e in V.analyze(t)["E"]))
+        t = read(BORRADOR).replace("`OneTime`", "`Month`", 1)
+        self.assertTrue(any("Month" in e for e in V.analyze(t)["E"]))
 
     def test_doc_con_fuente_externa_es_error(self):
         t = read(BORRADOR).replace(
-            "| DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` (tabla Core Pricing) |",
+            "| DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` (PriceAdjustmentTier) |",
             "| DOC | soft-builder.com/objeto |")
         self.assertTrue(any("fuente externa" in e for e in V.analyze(t)["E"]))
 
     def test_derivado_externo_sin_help_es_error(self):
         t = read(BORRADOR).replace(
-            "| DERIVADO | Help 264 \"Create Attribute Based Adjustments\"",
-            "| DERIVADO | https://ejemplo.com/obj \"Create Attribute Based Adjustments\"")
+            "| DOC | `references/schema-diff/264-schema.json` (PriceAdjustmentTier.TierValue) |",
+            "| DERIVADO | https://ejemplo.com/obj \"TierValue\" |")
         self.assertTrue(any("sin contrastar" in e for e in V.analyze(t)["E"]))
 
     def test_derivado_sin_referencia_es_error(self):
