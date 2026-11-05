@@ -15,6 +15,7 @@ Orden de las secciones 3: 3 Componentes → 3.1 Verificación de API → 3.2 Via
 **Incertidumbre:** <la pregunta técnica o de negocio que hay que responder, en una frase>
 **Fuentes consultadas (rlm-skill):** <sub-skills y artículos de Help 264 consultados> | no disponible
 **Restricciones del SE:** <literal> | Ninguna
+**Verificación de coherencia (rlm-verifier):** <APROBADO | CON RESERVAS> · <fecha> · VERIFICACION-RLM.md
 **Supuestos clave:** <los supuestos que condicionan el diseño, en la primera página (R6)>
 **Reparto:** IA <n> (<x>%) · IA+Revisión <n> · Persona <n> · **Niveles:** 🟢 <n> · 🔵 <n> · 🟠 <n>
 
@@ -133,5 +134,7 @@ Cada hipótesis debe quedar cubierta por algún `CASO-n` con valor esperado. `va
 Aprobación: **no se edita a mano**. El SE (o el agente por orden suya) ejecuta
 `validate_manifest_poc.py M.md --approve "Nombre"`, que exige cero errores en modo estricto y escribe
 `Estado de revisión: APROBADO`, `Revisado por`, `Fecha de aprobación` y `Hash de aprobación`
-(sha256 del contenido sin esas líneas). Un cambio posterior invalida el hash. Sin eso la Fase 3 no arranca. La sección 9 (Resultado) la añade la Fase 3,
+(sha256 del contenido sin esas líneas). Un cambio posterior invalida el hash. Sin eso la Fase 3 no arranca. La línea `Verificación de coherencia (rlm-verifier)` la rellena quien orquesta
+(`revenue-intake`) con el dictamen del verificador independiente, que revisa el manifiesto contra `rlm-skill`
+antes de que el SE lo apruebe; el informe se guarda como `VERIFICACION-RLM.md` junto al manifiesto. La sección 9 (Resultado) la añade la Fase 3,
 no se incluye en el borrador porque todavía no hay evidencia.

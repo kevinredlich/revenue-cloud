@@ -20,7 +20,8 @@ Niveles de exigencia
   disponible (sin consulta, todo es SUPUESTO).
   AVISO (ERROR con --strict, --gate o --approve): marcadores <completar>, falta de pre-vuelo (R2),
   falta de casos de prueba con valor esperado (R14), CUSTOM REAL sin alternativa estándar (R12),
-  moneda fijada por el origen (R8, solo AVISO) y fuentes externas sin confirmar con describe.
+  moneda fijada por el origen (R8, solo AVISO), fuentes externas sin confirmar con describe y la
+  línea 'Verificación de coherencia (rlm-verifier)' con dictamen APROBADO o CON RESERVAS.
 
 Aprobación (--approve / --gate)
   --approve exige un manifiesto sin errores en modo estricto, pone Estado de revisión: APROBADO,
@@ -210,6 +211,19 @@ def analyze(text, require_approved=False, strict=False, org=None):
         fuentes_no = True
         W.append("rlm-skill no consultada o no disponible: el diseño técnico no está validado; "
                  "todo debe constar como SUPUESTO en 3.1")
+
+    # --- Verificación independiente (rlm-verifier) -------------------------------------------
+    vm = re.search(r"^\*\*Verificación de coherencia \(rlm-verifier\):\*\*\s*(.*)$", text, re.M)
+    info["verificacion"] = None
+    if not vm:
+        quality("Falta '**Verificación de coherencia (rlm-verifier):**' en la cabecera: el diseño debe "
+                "revisarlo un verificador independiente contra rlm-skill antes de aprobarse")
+    else:
+        dictamen = vm.group(1).split("·")[0].strip()
+        info["verificacion"] = dictamen
+        if dictamen not in ("APROBADO", "CON RESERVAS"):
+            quality(f"Verificación de coherencia '{dictamen or 'vacía'}': solo APROBADO o CON RESERVAS permiten "
+                    "aprobar o ejecutar (RECHAZADO y NO VERIFICABLE bloquean)")
 
     # --- Valores de API conocidos como incorrectos --------------------------------------------
     bad_api = load_bad_api()

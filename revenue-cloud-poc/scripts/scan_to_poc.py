@@ -345,6 +345,7 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
 **Incertidumbre:** Migración de Salesforce CPQ a Revenue Cloud — ver hipótesis por mecanismo detectado
 **Fuentes consultadas (rlm-skill):** <completar: sub-skills y artículos de Help 264 consultados, o "no disponible">
 **Restricciones del SE:** <completar>
+**Verificación de coherencia (rlm-verifier):** <pendiente — la rellena el flujo tras pasar el verificador>
 **Supuestos clave:** Org objetivo con Revenue Cloud (RLM) provisionado; resto por completar (ver sección 7)
 **Reparto:** {hdr_reparto} · **Niveles:** {hdr_niveles}
 

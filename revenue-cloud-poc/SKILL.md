@@ -39,6 +39,10 @@ bajo qué condiciones?"**, no "¿cómo gusta esto al cliente?". Antes de usarla,
   de diseñar y antes de entregar.
 
 ## FASE 0 — Intake unificado (antes de decidir DEMO / POC / Migración)
+> La Fase 0 y el enrutado los orquesta la skill `revenue-intake` (`flujo-revenue/`): genera
+> `BRIEF-CLIENTE.md` y `MANIFIESTO-NECESIDADES.md`, espera la decisión del SE y deriva al agente de demos
+> o al de POC. **En ambos caminos `rlm-skill` es obligatoria y `rlm-verifier` revisa el resultado.**
+
 **Esto va primero, siempre, venga el origen de un brief escrito a mano o de un scan de CPQ Scout.**
 No se decide DEMO ni POC mirando solo el documento del cliente: primero se genera un
 `MANIFIESTO-NECESIDADES.md` con las necesidades clasificadas (`NEC-n` + semáforo 🟢/🟡/🔴) y una
@@ -63,19 +67,12 @@ una recomendación técnica, nunca una aprobación del cliente. Se para ahí y s
 corto (semáforo, modalidad propuesta, preguntas de refinamiento). Solo tras la confirmación
 (sección 4, o en conversación) se activa el workflow correspondiente:
 - **DEMO** → **se delega en el agente `demo-brief-architect`** (`nespon-brief-agent/`, con sus skills
-  `nespon-brief-to-demo`, `nespon-demo-builder` y `rlm-skill`). Esta skill no diseña ni construye la
-  demo: invoca al agente pasándole `MANIFIESTO-NECESIDADES.md` como brief de entrada (las `NEC-n` ya
-  clasificadas sustituyen la lectura manual del documento original), la modalidad confirmada y las
-  restricciones del SE, y se detiene. El agente sigue su propio flujo (manifiesto de demo, pitch,
-  datos → aprobación del SE → construcción) con su propia puerta de aprobación. Si el agente no está
-  disponible en la sesión, se dice y se entrega el `MANIFIESTO-NECESIDADES.md` como brief para
-  usarlo en cuanto lo esté; no se improvisa una demo con esta skill. **Todo el diseño
-  técnico de Revenue Cloud de la demo pasa por la Regla cero y R1–R14 de
-  `references/reglas-modelado-catalogo-rlm.md`** (rlm-skill primero, tablas 3.1–3.3, prueba
-  funcional con valores esperados): la demo no es una vía con menos exigencia que la POC. Si el
-  playbook de `nespon-brief-to-demo`/`nespon-demo-builder` contradice a `rlm-skill`, manda `rlm-skill`.
+  `nespon-brief-to-demo`, `nespon-demo-builder` y `rlm-skill`), pasándole `BRIEF-CLIENTE.md` y
+  `MANIFIESTO-NECESIDADES.md` y la modalidad confirmada. Esta skill no diseña ni construye la demo. Lo
+  orquesta la skill `revenue-intake` (`flujo-revenue/`), que además pasa el resultado por `rlm-verifier`.
+  Si el agente no está disponible, se dice y se entrega el brief; no se improvisa una demo aquí.
 - **POC o Migración** (migración = POC cuya incertidumbre viene de un scan, no un workflow
-  distinto) → continúa con la FASE 1 de esta misma skill, reutilizando las `NEC-n` ya confirmadas
+  distinto) → `revenue-intake` lanza el agente `poc-architect`, que continúa con la FASE 1 de esta misma skill, reutilizando las `NEC-n` ya confirmadas
   en vez de re-derivarlas desde cero. Con origen scan, vuelve a correr `scan_to_poc.py` con
   `--modalidad poc` sobre el mismo JSON para obtener el pre-borrador de `MANIFIESTO-POC.md` con las
   hipótesis (`HIP-n`) ya planteadas.
