@@ -7,7 +7,7 @@
 **Incertidumbre:** ¿El motor de pricing estándar de Revenue Cloud puede aplicar un descuento por volumen escalonado (no plano) sin desarrollo a medida?
 **Fuentes consultadas (rlm-skill):** `subskills/revenue-cloud-data-model/domains/pricing.md`; `subskills/pricing-wiring/guide.md`; `references/schema-diff/264-schema.json`; `references/apis/transaction-management-apis-reference.md`; `references/apis/pricing-business-apis-v68.md`; `references/revenue-cloud-permissions.md`; Help 264 "Create Price Adjustment Tiers for Volume Discounts" y "Volume and Tier Based Discounts"
 **Restricciones del SE:** Solo mecanismos estándar de Pricing; nada de Apex para el cálculo
-**Supuestos clave:** La org tiene Revenue Cloud (RLM) provisionado; el tipo de ajuste `Percentage` se confirma con describe (sección 7); los tramos y el precio base son los del ejemplo
+**Supuestos clave:** La org tiene Revenue Cloud (RLM) provisionado; los valores `TierType` = `AdjustmentPercentage` y `AdjustmentMethod` = `Range` se confirman con describe en el pre-vuelo (sección 7); cómo se persiste el precio en la línea y el enlace del procedure con el plan son SUPUESTOS declarados en la sección 7; los tramos y el precio base son los del ejemplo
 **Reparto:** IA 8 (72%) · IA+Revisión 0 · Persona 3 · **Niveles:** 🟢 6 · 🔵 5 · 🟠 0
 
 ## 1. Contexto y necesidad de origen
@@ -36,12 +36,12 @@
 | CMP-2 | EXP-1 | Producto de prueba | Product2 | Estándar SF | "Vino Reserva Caja 6u" | 🟢 | IA | — | S | Pendiente |
 | CMP-3 | EXP-1 | Precio de lista | PriceBookEntry | Estándar SF | `UnitPrice` 42 (moneda de la org, sin fijar `CurrencyIsoCode`) en el Standard Price Book para CMP-2 y el selling model de CMP-4 | 🟢 | IA | — | S | Pendiente |
 | CMP-4 | EXP-1 | Modelo de venta | ProductSellingModel | Estándar RLM | Reutilizar un selling model `OneTime` existente (consulta de pre-vuelo); crear uno solo si no existe (R10) | 🟢 | IA | — | S | Pendiente |
-| CMP-5 | EXP-1 | Programa de ajuste por volumen | PriceAdjustmentSchedule | Estándar RLM | `ScheduleType` = `Volume`, `AdjustmentMethod` = `Range`; inactivo hasta cargar los tramos | 🔵 | IA | — | S | Pendiente |
+| CMP-5 | EXP-1 | Programa de ajuste por volumen | PriceAdjustmentSchedule | Estándar RLM | `Name` "Volumen Altiplano", `ScheduleType` = `Volume`, `AdjustmentMethod` = `Range`, `EffectiveFrom` = TODAY; inactivo hasta cargar los tramos | 🔵 | IA | — | S | Pendiente |
 | CMP-6 | EXP-1 | Tramos de descuento | PriceAdjustmentTier | Estándar RLM | 3 registros sobre CMP-2, CMP-4 y CMP-5: `TierType` = `AdjustmentPercentage`; `TierValue` 0 / 5 / 12; `LowerBound`-`UpperBound` 1-49 / 50-99 / 100+; `EffectiveFrom` = TODAY, tramos consecutivos y sin solape | 🔵 | IA | — | M | Pendiente |
 | CMP-7 | EXP-1 | Activar programa y refrescar tabla | Setup | Estándar RLM | Activar CMP-5 (`IsActive`); refrescar la decision table "Volume Discount Entries" en Setup → Decision Tables y comprobar su fecha de último refresco en Lookup Tables | 🔵 | Persona | Pantallas de la app Price Management y de Setup | S | Pendiente |
 | CMP-8 | EXP-2 | Pricing procedure con elemento de descuento por volumen | Pricing procedure | Estándar RLM | Clon del procedure por defecto (no se modifica el entregado, `subskills/pricing-wiring/guide.md`) con los elementos Pricing Setting, List Price (decision table Price Book Entries) y Volume Discount; constante `VolumePriceAdjustmentScheduleId` (Text) con el Id de CMP-5 y la decision table refrescada en CMP-7 | 🔵 | Persona | Se construye en el Pricing Procedure Builder (interfaz) | M | Pendiente |
 | CMP-9 | EXP-2 | Quote de prueba | Quote | Estándar SF | `Pricebook2Id` = Standard Price Book; `OpportunityId` de la oportunidad de DAT-1 | 🔵 | IA | — | S | Pendiente |
-| CMP-10 | EXP-2 | Líneas de prueba | QuoteLineItem | Estándar SF | `Quantity` 30 / 75 / 150 sobre CMP-2 con `PricebookEntryId` de CMP-3; `ProductSellingModelId` no es creable en la línea (`QuoteLineItem`, esquema 264), así que las líneas se crean con Place Sales Transaction (`references/apis/transaction-management-apis-reference.md`) y los precios se calculan con la API de cálculo de precios (`references/apis/pricing-business-apis-v68.md`) | 🟢 | IA | — | S | Pendiente |
+| CMP-10 | EXP-2 | Líneas de prueba | QuoteLineItem | Estándar SF | `Quantity` 30 / 75 / 150 sobre CMP-2 con `PricebookEntryId` de CMP-3; `ProductSellingModelId` no es creable en la línea (`QuoteLineItem`, esquema 264), así que las líneas se crean con Place Sales Transaction (`references/apis/transaction-management-apis-reference.md`) con la preferencia de precio `pricingPref` de esa API para que el precio se calcule y se persista en la línea (`references/apis/transaction-management-apis-reference.md`; `/connect/core-pricing/pricing` de `references/apis/pricing-business-apis-v68.md` solo devuelve precios, no escribe en la línea) | 🟢 | IA | — | S | Pendiente |
 | CMP-11 | EXP-3 | Consulta de verificación | Query | Estándar SF | SOQL sobre `QuoteLineItem`: `Quantity`, `ListPrice`, `NetUnitPrice`, `TotalPrice` | 🟢 | IA | — | S | Pendiente |
 
 ## 3.1 Verificación de nombres y valores de API
@@ -54,6 +54,8 @@
 | PriceAdjustmentTier | TierType | `AdjustmentPercentage` | DOC | `references/schema-diff/264-schema.json` (PriceAdjustmentTier.TierType: AdjustmentPercentage, AdjustmentAmount, OverrideAmount); Help 264 "Create Price Adjustment Tiers for Volume Discounts" |
 | PriceAdjustmentTier | TierValue | `TierValue` | DOC | `references/schema-diff/264-schema.json` (PriceAdjustmentTier.TierValue) |
 | PriceAdjustmentTier | Product2Id, ProductSellingModelId, PriceAdjustmentScheduleId | `Product2Id`, `ProductSellingModelId`, `PriceAdjustmentScheduleId` | DOC | `references/schema-diff/264-schema.json` (PriceAdjustmentTier); Help 264 "Create Price Adjustment Tiers for Volume Discounts" |
+| ProductSellingModel | SellingModelType | `OneTime` | DOC | `references/schema-diff/264-schema.json` (ProductSellingModel.SellingModelType: OneTime, TermDefined, Evergreen) |
+| Quote | Pricebook2Id, OpportunityId | `Pricebook2Id`, `OpportunityId` | DOC | `references/schema-diff/264-schema.json` (Quote) |
 | PriceBookEntry | UnitPrice | `UnitPrice` | DOC | `subskills/revenue-cloud-data-model/domains/pricing.md` (PriceBookEntry) |
 | QuoteLineItem | Quantity, NetUnitPrice, TotalPrice | `Quantity`, `NetUnitPrice`, `TotalPrice` | DOC | `references/schema-diff/264-schema.json` (QuoteLineItem) |
 
@@ -86,7 +88,7 @@
 ### CMP-8 — Pricing procedure con elemento de descuento por volumen
 - **Ruta:** Pricing Procedure Builder → añadir el elemento Volume Discount (el nombre del menú puede variar).
 - **Valores:** elementos Pricing Setting, List Price y Volume Discount; constante `VolumePriceAdjustmentScheduleId` (Text) = Id de CMP-5.
-- **Comprobar:** el procedure se guarda y se activa sin errores.
+- **Comprobar:** el procedure se guarda y se activa sin errores. Si se acaba de refrescar la decision table (CMP-7), no activarlo de inmediato: hacer un cambio menor, guardarlo de nuevo y activar (Help 264, `salesforce-help/264/help/pricing.md`).
 - **Desbloquea:** CMP-10
 
 ## 5. Datos de prueba
@@ -109,11 +111,13 @@ CMP-1 → CMP-2 → CMP-4 → CMP-3 → CMP-5 → CMP-6 → CMP-7 → CMP-8 → 
 
 ## 7. Supuestos y preguntas abiertas
 - Supuesto: la org objetivo tiene Revenue Cloud (RLM) provisionado con la licencia Growth o Advanced, no solo Sales Cloud con CPQ heredado.
-- Pre-vuelo (Prerrequisitos de la org, R2): consulta de solo lectura de la `PermissionSetLicense` `CorePricingDesignTime`, de los selling models `OneTime` existentes, de un Standard Price Book con productos, y `describe` de `PriceAdjustmentSchedule` y `PriceAdjustmentTier`; moneda corporativa de la org (el diseño no la fija).
+- Pre-vuelo (Prerrequisitos de la org, R2): consulta de solo lectura de la `PermissionSetLicense` `CorePricingDesignTime`, de los selling models `OneTime` existentes, de un Standard Price Book con productos, y `describe` de `PriceAdjustmentSchedule` (`ScheduleType`, `AdjustmentMethod`) y `PriceAdjustmentTier` (`TierType`); moneda corporativa de la org (el diseño no la fija).
+- Supuesto: `pricingPref` de Place Sales Transaction (Force, Skip o System) persiste el precio calculado en la línea; se confirma en el pre-vuelo y en EXP-2. Si no, el mecanismo de persistencia se rediseña antes de ejecutar.
 - Supuesto: cómo se enlaza el pricing procedure clonado al procedure plan que usa la quote (`subskills/pricing-wiring/guide.md`, sección Procedure Plans y Overlays) y el contenido exacto de Place Sales Transaction se confirman en el pre-vuelo y en EXP-2; si no se enlazan, el precio no cambia y la hipótesis queda NO CONCLUYENTE, no NO VALIDADA.
 - Pregunta para el SE: ¿los tramos reales son los de este ejemplo o el cliente los ha definido en el brief?
 
 ## 8. Registro de cambios
 - v1: versión inicial a partir de la duda planteada por el comercial.
 - v1.1: corregido tras una primera revisión independiente contra rlm-skill (`ScheduleType`, `TierType`, `AdjustmentMethod`, `PricebookEntry`, pricing procedure, licencias y citas de Help).
+- v1.3: tras una tercera revisión (CON RESERVAS) se declaran como supuesto la persistencia del precio (`pricingPref`) y el enlace con el plan, y se completan 3.1, CMP-5 y la tarea CMP-8.
 - v1.2: corregido tras una segunda revisión (`ProductSellingModelId` no creable en la línea, ruta de refresco de la decision table, elementos del procedure, permisos de cálculo).
