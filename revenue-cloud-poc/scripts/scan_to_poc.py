@@ -32,6 +32,7 @@ El JSON de entrada es el campo "result" de ScanStatusResponse, o el ScanResult d
 """
 import argparse
 import json
+import os
 import sys
 from datetime import date
 
@@ -80,6 +81,26 @@ def _semaforo_row(row):
     return "🟢"
 
 
+def esc(value):
+    """Texto seguro para una celda de tabla markdown (el scan trae texto libre con '|' y saltos)."""
+    return str(value if value is not None else "?").replace("\\", "\\\\").replace("|", "\\|").replace("\r", " ").replace("\n", " ").strip()
+
+
+MAX_NEC = 15
+
+
+def numbered_rows(inventory, limit=MAX_NEC):
+    """Filas del inventario con su NEC-n, IGUAL en intake y poc (la trazabilidad no se rompe entre
+    documentos). Orden 🔴→🟡→🟢; todas las filas de riesgo se incluyen siempre, las 🟢 rellenan hasta
+    el límite. Devuelve (lista[(nec_id, fila, semáforo)], filas_omitidas)."""
+    ranked = sorted(inventory, key=lambda r: {"🔴": 0, "🟡": 1, "🟢": 2}.get(_semaforo_row(r), 1))
+    risky = [r for r in ranked if _semaforo_row(r) != "🟢"]
+    greens = [r for r in ranked if _semaforo_row(r) == "🟢"]
+    shown = risky + greens[:max(0, limit - len(risky))]
+    out = [(f"NEC-{i}", r, _semaforo_row(r)) for i, r in enumerate(shown, start=2)]
+    return out, len(inventory) - len(shown)
+
+
 def build_intake_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
     """
     MANIFIESTO-NECESIDADES.md: primer documento del flujo, antes de decidir modalidad.
@@ -102,26 +123,19 @@ def build_intake_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
         f"Necesidad global, se concreta en las filas siguientes | Confirmar prioridades con el "
         f"cliente | Scan CPQ Scout |"
     ]
-    n = 2
-    shown = 0
-    for row in sorted(inventory, key=lambda r: {"🔴": 0, "🟡": 1, "🟢": 2}.get(_semaforo_row(r), 1)):
-        if shown >= 15:
-            break
-        sem = _semaforo_row(row)
+    numbered, resto = numbered_rows(inventory)
+    for nec_id, row, sem in numbered:
         pend = "Ninguna" if sem == "🟢" else (
             "Confirmar si el mecanismo detectado es correcto y si hace falta reproducirlo exacto"
             if sem == "🟡" else
             "Confirmar impacto en negocio; probablemente requiere desarrollo o rediseño de proceso"
         )
         nec_lines.append(
-            f"| {sem} | NEC-{n} | `{row.get('sbqq_object', '?')}` "
-            f"({row.get('record_count', '?')} registros) → {row.get('rca_equivalent', '?')} "
-            f"[{row.get('migration_type', '?')}] | {row.get('notes') or 'Sin notas del scan'} | "
+            f"| {sem} | {nec_id} | `{esc(row.get('sbqq_object'))}` "
+            f"({esc(row.get('record_count'))} registros) → {esc(row.get('rca_equivalent'))} "
+            f"[{esc(row.get('migration_type'))}] | {esc(row.get('notes') or 'Sin notas del scan')} | "
             f"{pend} | Scan CPQ Scout |"
         )
-        n += 1
-        shown += 1
-    resto = len(inventory) - shown
     if resto > 0:
         nec_lines.append(
             f"<!-- + {resto} fila(s) más del inventario, omitidas aquí por brevedad: "
@@ -234,34 +248,38 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
         f"productos activos, {catalog.get('bundles', '?')} bundles, "
         f"{scan.get('transactions', {}).get('total_quotes', '?')} quotes históricas | Scan CPQ Scout |"
     )
-    n = 2
-    for row in confirmed[:8]:  # no listar las 200 filas directas; son ruido para el manifiesto
+    numbered, resto = numbered_rows(inventory)  # misma numeración que el MANIFIESTO-NECESIDADES.md
+    nec_of = {}
+    for nec_id, row, sem in numbered:
+        nec_of[id(row)] = nec_id
+        mecanismo = ("migra de forma directa a" if sem == "🟢" else "→ equivalente RLM a comprobar:")
         nec_lines.append(
-            f"| NEC-{n} | {row.get('sbqq_object', '?')} ({row.get('record_count', '?')} registros) "
-            f"migra de forma directa a {row.get('rca_equivalent', '?')} | Scan CPQ Scout |"
+            f"| {nec_id} | {esc(row.get('sbqq_object'))} ({esc(row.get('record_count'))} registros) "
+            f"{mecanismo} {esc(row.get('rca_equivalent'))} [{esc(row.get('migration_type'))}] | Scan CPQ Scout |"
         )
-        n += 1
-    if len(confirmed) > 8:
+    if resto > 0:
         nec_lines.append(
-            f"<!-- + {len(confirmed) - 8} objetos más de migración directa/riesgo bajo, "
-            f"omitidos aquí por brevedad: ver detalle completo en el scan_id {scan.get('scan_id', '?')} -->"
+            f"<!-- + {resto} fila(s) más del inventario (migración directa/riesgo bajo), "
+            f"omitidas aquí por brevedad: ver detalle completo en el scan_id {scan.get('scan_id', '?')} -->"
         )
 
     hip_lines = []
     exp_lines = []
     h = 1
     for row in uncertain:
+        nec_ref = nec_of.get(id(row), "NEC-1")
+        obj, eq = esc(row.get("sbqq_object")), esc(row.get("rca_equivalent"))
         hip_lines.append(
-            f"| HIP-{h} | ¿El mecanismo de `{row.get('sbqq_object', '?')}` "
-            f"({row.get('notes', 'sin notas del scan')}) tiene equivalente estándar en RLM "
-            f"(`{row.get('rca_equivalent', '?')}`) o requiere un diseño custom real? | NEC-1 | "
+            f"| HIP-{h} | ¿El mecanismo de `{obj}` "
+            f"({esc(row.get('notes') or 'sin notas del scan')}) tiene equivalente estándar en RLM "
+            f"({eq}) o requiere un diseño custom real? | NEC-1, {nec_ref} | "
             f"Se reproduce el comportamiento observado en origen usando solo configuración estándar "
-            f"de {row.get('rca_equivalent', '?')} | Si no hay equivalente estándar, queda NO VALIDADA "
+            f"de {eq} | Si no hay equivalente estándar, queda NO VALIDADA "
             f"y se documenta en 3.2 como CUSTOM REAL con el mejor diseño (R12/R13) o rediseño de proceso |"
         )
         exp_lines.append(
-            f"| EXP-{h} | Configurar `{row.get('rca_equivalent', '?')}` para reproducir "
-            f"`{row.get('sbqq_object', '?')}` con un caso representativo del origen | HIP-{h} | "
+            f"| EXP-{h} | Configurar {eq} para reproducir "
+            f"`{obj}` con un caso representativo del origen | HIP-{h} | "
             f"<caso de prueba extraído del origen — completar> | <qué resultado confirmaría la "
             f"hipótesis — completar> | <consulta/captura/log — completar> |"
         )
@@ -271,7 +289,8 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
         hip_lines.append(
             f"| HIP-{h} | El pricing con Apex/QCP detectado ({pricing.get('price_rules_with_apex', 0)} "
             f"price rules con Apex, {pricing.get('qcp_scripts', 0)} scripts QCP) tiene un equivalente "
-            f"estándar en RLM (expression sets / decision tables) sin reescribir lógica | NEC-1 | "
+            f"estándar en RLM (expression sets / decision tables) sin reescribir lógica | "
+            f"{', '.join(['NEC-1'] + sorted({nec_of[id(r)] for r in uncertain if id(r) in nec_of and any(k in str(r.get('sbqq_object', '')) for k in ('PriceRule', 'QCP', 'QuoteProcess'))}))} | "
             f"El resultado del cálculo coincide con el de origen para los casos de prueba | "
             f"Si la lógica depende de código a medida irreproducible en estándar, queda NO VALIDADA "
             f"y pasa a desarrollo |"
@@ -326,6 +345,8 @@ def build_manifest(scan, cliente, sector, zona_fiscal, org_objetivo):
 **Incertidumbre:** Migración de Salesforce CPQ a Revenue Cloud — ver hipótesis por mecanismo detectado
 **Fuentes consultadas (rlm-skill):** <completar: sub-skills y artículos de Help 264 consultados, o "no disponible">
 **Restricciones del SE:** <completar>
+**Verificación de coherencia (rlm-verifier):** <pendiente — la rellena el flujo tras pasar el verificador>
+**Supuestos clave:** Org objetivo con Revenue Cloud (RLM) provisionado; resto por completar (ver sección 7)
 **Reparto:** {hdr_reparto} · **Niveles:** {hdr_niveles}
 
 <!-- Generado automáticamente desde scan_id {scan.get('scan_id', '?')} de CPQ Scout
@@ -358,6 +379,12 @@ equivalente estándar en Revenue Cloud sin desarrollo a medida.
 |----|------|------------|------|--------|----------------|-------|-------------|--------|--------|--------|
 {total_cmp_placeholder}
 
+## 3.1 Verificación de nombres y valores de API
+<!-- PLANTILLA (Regla cero): un registro por cada objeto, campo o valor de API usado. Clase DOC | DERIVADO | SUPUESTO. -->
+| Objeto | Campo / valor | Valor usado | Clase | Referencia |
+|--------|---------------|-------------|-------|------------|
+| <completar> | <completar> | <completar> | <DOC / DERIVADO / SUPUESTO> | <fichero del kit o artículo de Help> |
+
 ## 3.2 Viabilidad por requisito
 <!-- PLANTILLA (R12): una fila por requisito/hipótesis. Vía = ESTÁNDAR | ESTÁNDAR A VALIDAR | CUSTOM REAL.
      Leer antes el artículo de Help 264 y sus límites vía rlm-skill. CUSTOM REAL = diseño con piezas
@@ -371,12 +398,6 @@ equivalente estándar en Revenue Cloud sin desarrollo a medida.
 | Decisión | Alternativa elegida | Alternativas descartadas | Motivo (encaje RLM, jerarquía, coherencia, mantenimiento, esfuerzo) |
 |----------|---------------------|---------------------------|----------------------------------------------------------------------|
 | <completar> | <completar> | <completar> | <completar> |
-
-## 3.1 Verificación de nombres y valores de API
-<!-- PLANTILLA (Regla cero): un registro por cada objeto, campo o valor de API usado. Clase DOC | DERIVADO | SUPUESTO. -->
-| Objeto | Campo / valor | Valor usado | Clase | Referencia |
-|--------|---------------|-------------|-------|------------|
-| <completar> | <completar> | <completar> | <DOC / DERIVADO / SUPUESTO> | <fichero del kit o artículo de Help> |
 
 ## 4. Tareas de persona
 <!-- PLANTILLA: un bloque "### CMP-n — <nombre>" por cada componente con Responsable = Persona. -->
@@ -394,6 +415,7 @@ equivalente estándar en Revenue Cloud sin desarrollo a medida.
 - Generado automáticamente desde el scan {scan.get('scan_id', '?')}; revisar con el SE antes de dar
   por buena ninguna fila.
 - Supuesto: la org objetivo ({org_objetivo}) tiene Revenue Cloud (RLM) provisionado.
+- Pre-vuelo (Prerrequisitos de la org, R2): <completar — altas y consultas de solo lectura que confirman licencias, permisos y objetos antes de cargar datos>
 - Pregunta para el SE: ¿los {len(uncertain)} mecanismo(s) de riesgo medio/alto detectados por el
   scan son los prioritarios, o hay otros del cliente que no aparecen en CPQ (p. ej. procesos
   manuales)?
@@ -415,6 +437,7 @@ def main():
     ap.add_argument("--modalidad", choices=["intake", "poc"], default="intake",
                      help="intake (por defecto): MANIFIESTO-NECESIDADES.md, antes de decidir modalidad. "
                           "poc: PRE-BORRADOR de MANIFIESTO-POC.md, tras confirmar modalidad=POC/Migración.")
+    ap.add_argument("--force", action="store_true", help="sobrescribir --out si ya existe")
     ap.add_argument("--out", required=True,
                      help="Ruta de salida: poc-<slug>/MANIFIESTO-NECESIDADES.md (intake) o "
                           "poc-<slug>/MANIFIESTO-POC.md (poc)")
@@ -422,7 +445,10 @@ def main():
 
     scan = load_scan(args.scan_json)
 
-    import os
+    if os.path.exists(args.out) and not args.force:
+        print(f"ERROR: {args.out} ya existe; no se sobrescribe (puede tener trabajo del SE). Usa --force.",
+              file=sys.stderr)
+        return 1
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
 
     if args.modalidad == "intake":
@@ -439,6 +465,7 @@ def main():
         print("  PENDIENTE: confirmar modalidad con el SE/cliente (sección 4) antes de generar el "
               "manifiesto definitivo. Si es POC/Migración, vuelve a correr este script con "
               "--modalidad poc sobre el mismo scan.")
+        return 0
     else:
         md = build_manifest(scan, args.cliente, args.sector, args.zona_fiscal, args.org_objetivo)
         with open(args.out, "w", encoding="utf-8") as f:
@@ -448,8 +475,10 @@ def main():
         print(f"  Hipótesis generadas: {max(1, len(uncertain))}")
         print(f"  Riesgo global del scan: {scan.get('scores', {}).get('risk_level', '?')} "
               f"({scan.get('scores', {}).get('overall', '?')}/100)")
+        print("  Los NEC-n coinciden con los del MANIFIESTO-NECESIDADES.md generado del mismo scan.")
         print("  PENDIENTE: completar secciones 3-8 (componentes, datos, orden, supuestos) antes de "
               "pasar validate_manifest_poc.py y de pedir aprobación al SE.")
+    return 0
 
 
 if __name__ == "__main__":

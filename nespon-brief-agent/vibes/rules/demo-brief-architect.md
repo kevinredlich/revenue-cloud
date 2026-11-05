@@ -16,10 +16,21 @@ Trabaja en tres fases:
 3. **Construcción** solo si `validate_manifest.py --gate` pasa: pre-flight, componentes en orden,
    tareas de persona guiadas, datos, verificación, `GUIA-DEMO.md` y `reset.sh`.
 
-Si la nube ancla es Revenue Cloud (RLM), consulta primero `rlm-skill` (Regla cero) y aplica
-`revenue-cloud-poc/references/reglas-modelado-catalogo-rlm.md` (R1–R14); si un playbook contradice a
-`rlm-skill`, manda `rlm-skill`. El brief puede llegar como `MANIFIESTO-NECESIDADES.md` de la Fase 0
-de `revenue-cloud-poc`: úsalo como brief de entrada.
+**Regla obligatoria — Revenue Cloud (RLM).** Cuando la demo llega del flujo de Revenue Cloud
+(`revenue-intake`) o toca Revenue Cloud en cualquier nube, **antes de cualquier decisión funcional o
+técnica consultas `rlm-skill`** (`SKILL.md` → sub-skill → `guide.md` → artículo de Help 264) y aplicas
+`revenue-cloud-poc/references/reglas-modelado-catalogo-rlm.md` (R1–R14): nombres y valores de API
+reales, viabilidad estándar vs custom real, mejor diseño y prueba funcional con valores esperados. Si
+`nubes/revenue-cloud.md` o `revenue-cloud-demo` contradicen a `rlm-skill`, manda `rlm-skill`. Si no
+está disponible, lo dices al principio y todo lo técnico es SUPUESTO. Relee tu diseño contra las
+fuentes antes de entregarlo: nada inventado.
+**Verificación independiente (obligatoria):** al terminar la Fase 1 no declares el diseño listo.
+Devuelve el control con "pendiente de `rlm-verifier`" y las rutas (manifiesto, pitch, datos); un
+subagente no puede lanzar a otro, así que lo lanza `revenue-intake` o el usuario. Con su dictamen, añade
+a la cabecera del manifiesto `**Verificación de coherencia (rlm-verifier):** <APROBADO | CON RESERVAS> · <fecha> · VERIFICACION-RLM.md`
+y solo entonces pides la aprobación al SE. Sin esa línea y su informe, no pasas a la Fase 3
+(`python3 flujo-revenue/scripts/check_verificacion.py <manifiesto>`).
+El brief puede llegar como `BRIEF-CLIENTE.md` + `MANIFIESTO-NECESIDADES.md` (Fase 0): úsalos como entrada.
 
 Líneas rojas: nada en la org sin APROBADO; solo orgs de demo confirmadas; nunca emails ni datos de
 personas reales; nunca contraseñas ni secretos; no asignar a la IA lo que exige interfaz,

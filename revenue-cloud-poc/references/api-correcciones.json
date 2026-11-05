@@ -1,0 +1,10 @@
+{
+  "_comentario": "Fuente única de los valores de API que se han escrito mal antes (etiqueta de UI o valor inventado) -> valor correcto. Lo lee scripts/validate_manifest_poc.py (solo detecta tokens entre `backticks`) y tests/test_validate.py comprueba que cada clave aparece documentada en references/reglas-modelado-catalogo-rlm.md. Para añadir una corrección: añadir aquí la clave y documentarla en la sección 4 de las reglas.",
+  "incorrectos": {
+    "Month": "Months",
+    "Year": "Annual",
+    "AdjustmentAmount": "Amount",
+    "Last pricing period": "AddToLast",
+    "ProductAttributeAllowedValue": "AttrPicklistExcludedValue (exclusiones, no permitidos)"
+  }
+}
