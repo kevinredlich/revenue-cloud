@@ -1,0 +1,76 @@
+{
+ "client_slug": "agentforce",
+ "objects": [
+  {
+   "sobject": "Account",
+   "records": [
+    {
+     "ref": "ACC1",
+     "Name": "Conservas del Segura SL",
+     "Industry": "Food & Beverage",
+     "BillingCity": "Murcia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC2",
+     "Name": "Hotel Brisa Mediterránea SA",
+     "Industry": "Hospitality",
+     "BillingCity": "Alicante",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC3",
+     "Name": "Muebles Levante SL",
+     "Industry": "Retail",
+     "BillingCity": "Valencia",
+     "BillingCountry": "Spain"
+    }
+   ]
+  },
+  {
+   "sobject": "Order",
+   "records": [
+    {
+     "ref": "ORD1",
+     "Name": "Pedido 00011",
+     "AccountId": "@ACC2",
+     "Status": "Draft",
+     "EffectiveDate": "TODAY-2",
+     "Expected_Delivery__c": "TODAY+2"
+    },
+    {
+     "ref": "ORD2",
+     "Name": "Pedido 00012",
+     "AccountId": "@ACC3",
+     "Status": "Enviado",
+     "EffectiveDate": "TODAY-3",
+     "Expected_Delivery__c": "TODAY+3"
+    },
+    {
+     "ref": "ORD3",
+     "Name": "Pedido 00013",
+     "AccountId": "@ACC1",
+     "Status": "Draft",
+     "EffectiveDate": "TODAY-4",
+     "Expected_Delivery__c": "TODAY+1"
+    },
+    {
+     "ref": "ORD4",
+     "Name": "Pedido 00014",
+     "AccountId": "@ACC2",
+     "Status": "Enviado",
+     "EffectiveDate": "TODAY-5",
+     "Expected_Delivery__c": "TODAY+2"
+    },
+    {
+     "ref": "ORD5",
+     "Name": "Pedido 00015",
+     "AccountId": "@ACC3",
+     "Status": "Draft",
+     "EffectiveDate": "TODAY-6",
+     "Expected_Delivery__c": "TODAY+3"
+    }
+   ]
+  }
+ ]
+}

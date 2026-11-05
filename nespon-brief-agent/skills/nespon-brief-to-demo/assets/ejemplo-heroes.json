@@ -1,0 +1,160 @@
+{
+ "objects": [
+  {
+   "sobject": "Account",
+   "records": [
+    {
+     "ref": "ACC-ESTRELLA",
+     "Name": "Distribuciones Vinícolas del Sureste SL",
+     "Canal__c": "Distribuidor",
+     "Industry": "Food & Beverage",
+     "Type": "Customer - Direct",
+     "BillingStreet": "Avenida Juan Carlos I, 45",
+     "BillingCity": "Murcia",
+     "BillingPostalCode": "30009",
+     "BillingCountry": "Spain",
+     "Phone": "+34 968 412 300",
+     "Website": "https://www.vinicolas-sureste.example",
+     "NumberOfEmployees": 85,
+     "AnnualRevenue": 9500000,
+     "AccountNumber": "B30123458",
+     "Description": "Principal distribuidor de Altiplano en Murcia y Alicante. Cubre HORECA y tiendas gourmet."
+    },
+    {
+     "ref": "ACC-HORECA",
+     "Name": "Grupo Hostelero Mar Menor SL",
+     "Canal__c": "HORECA",
+     "Industry": "Hospitality",
+     "Type": "Customer - Direct",
+     "BillingCity": "San Javier",
+     "BillingCountry": "Spain",
+     "Phone": "+34 968 190 220",
+     "Website": "https://www.hostelero-marmenor.example",
+     "NumberOfEmployees": 140,
+     "Description": "Grupo de 6 restaurantes y 2 hoteles en el Mar Menor."
+    }
+   ]
+  },
+  {
+   "sobject": "Contact",
+   "records": [
+    {
+     "ref": "CON-COMPRAS",
+     "FirstName": "Rocío",
+     "LastName": "Garrido",
+     "AccountId": "@ACC-ESTRELLA",
+     "Title": "Directora de Compras",
+     "Department": "Compras",
+     "Email": "rocio.garrido@vinicolas-sureste.example",
+     "MobilePhone": "+34 629 441 087",
+     "Phone": "+34 968 412 301"
+    },
+    {
+     "ref": "CON-GERENTE",
+     "FirstName": "Tomás",
+     "LastName": "Iglesias",
+     "AccountId": "@ACC-ESTRELLA",
+     "Title": "Gerente",
+     "Department": "Dirección",
+     "Email": "tomas.iglesias@vinicolas-sureste.example",
+     "MobilePhone": "+34 655 300 712"
+    },
+    {
+     "ref": "CON-SE",
+     "FirstName": "Contacto",
+     "LastName": "Pruebas SE",
+     "AccountId": "@ACC-HORECA",
+     "Title": "Contacto de pruebas",
+     "Email": "{{SE_EMAIL}}"
+    }
+   ]
+  },
+  {
+   "sobject": "Opportunity",
+   "records": [
+    {
+     "ref": "OPP-GANADA-1",
+     "Name": "Vinícolas del Sureste - Campaña Navidad",
+     "AccountId": "@ACC-ESTRELLA",
+     "StageName": "Closed Won",
+     "Amount": 148000,
+     "CloseDate": "TODAY-40",
+     "Type": "Existing Customer - Upgrade"
+    },
+    {
+     "ref": "OPP-GANADA-2",
+     "Name": "Vinícolas del Sureste - Reposición primavera",
+     "AccountId": "@ACC-ESTRELLA",
+     "StageName": "Closed Won",
+     "Amount": 96500,
+     "CloseDate": "TODAY-12",
+     "Type": "Existing Customer - Upgrade"
+    },
+    {
+     "ref": "OPP-RIESGO-1",
+     "Name": "Vinícolas del Sureste - Gama crianza 2026",
+     "AccountId": "@ACC-ESTRELLA",
+     "StageName": "Negotiation/Review",
+     "Amount": 72000,
+     "CloseDate": "TODAY+18",
+     "Stage_Entered_Date__c": "TODAY-42",
+     "NextStep": "Cerrar condiciones de volumen"
+    },
+    {
+     "ref": "OPP-RIESGO-2",
+     "Name": "Mar Menor - Carta de vinos verano",
+     "AccountId": "@ACC-HORECA",
+     "StageName": "Proposal/Price Quote",
+     "Amount": 38500,
+     "CloseDate": "TODAY+25",
+     "Stage_Entered_Date__c": "TODAY-35",
+     "NextStep": "Cata con el sumiller"
+    },
+    {
+     "ref": "OPP-RIESGO-3",
+     "Name": "Vinícolas del Sureste - Exportación Reino Unido",
+     "AccountId": "@ACC-ESTRELLA",
+     "StageName": "Qualification",
+     "Amount": 61000,
+     "CloseDate": "TODAY+30",
+     "Stage_Entered_Date__c": "TODAY-50",
+     "NextStep": "Enviar fichas técnicas en inglés"
+    },
+    {
+     "ref": "OPP-DESCUENTO",
+     "Name": "Mar Menor - Ampliación hoteles",
+     "AccountId": "@ACC-HORECA",
+     "StageName": "Negotiation/Review",
+     "Amount": 54000,
+     "Descuento__c": 18,
+     "CloseDate": "TODAY+10",
+     "Stage_Entered_Date__c": "TODAY-6",
+     "NextStep": "Aprobar descuento"
+    }
+   ]
+  },
+  {
+   "sobject": "Task",
+   "records": [
+    {
+     "ref": "TSK-1",
+     "Subject": "Cata de la gama crianza con Rocío",
+     "WhatId": "@OPP-RIESGO-1",
+     "WhoId": "@CON-COMPRAS",
+     "Status": "Completed",
+     "ActivityDate": "TODAY-44",
+     "Description": "Les gustó el crianza 2023; piden mejor precio por palé."
+    },
+    {
+     "ref": "TSK-2",
+     "Subject": "Llamada con Tomás sobre volumen anual",
+     "WhatId": "@OPP-RIESGO-1",
+     "WhoId": "@CON-GERENTE",
+     "Status": "Completed",
+     "ActivityDate": "TODAY-20",
+     "Description": "Quiere comprometer 12 palés si hay rappel."
+    }
+   ]
+  }
+ ]
+}

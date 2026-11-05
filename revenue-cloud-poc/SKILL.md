@@ -62,8 +62,14 @@ confirme esa modalidad se genera el manifiesto definitivo.
 una recomendación técnica, nunca una aprobación del cliente. Se para ahí y se presenta un resumen
 corto (semáforo, modalidad propuesta, preguntas de refinamiento). Solo tras la confirmación
 (sección 4, o en conversación) se activa el workflow correspondiente:
-- **DEMO** → `nespon-brief-to-demo`, usando `MANIFIESTO-NECESIDADES.md` como brief de entrada (las
-  `NEC-n` ya clasificadas sustituyen la lectura manual del documento original). **Todo el diseño
+- **DEMO** → **se delega en el agente `demo-brief-architect`** (`nespon-brief-agent/`, con sus skills
+  `nespon-brief-to-demo`, `nespon-demo-builder` y `rlm-skill`). Esta skill no diseña ni construye la
+  demo: invoca al agente pasándole `MANIFIESTO-NECESIDADES.md` como brief de entrada (las `NEC-n` ya
+  clasificadas sustituyen la lectura manual del documento original), la modalidad confirmada y las
+  restricciones del SE, y se detiene. El agente sigue su propio flujo (manifiesto de demo, pitch,
+  datos → aprobación del SE → construcción) con su propia puerta de aprobación. Si el agente no está
+  disponible en la sesión, se dice y se entrega el `MANIFIESTO-NECESIDADES.md` como brief para
+  usarlo en cuanto lo esté; no se improvisa una demo con esta skill. **Todo el diseño
   técnico de Revenue Cloud de la demo pasa por la Regla cero y R1–R14 de
   `references/reglas-modelado-catalogo-rlm.md`** (rlm-skill primero, tablas 3.1–3.3, prueba
   funcional con valores esperados): la demo no es una vía con menos exigencia que la POC. Si el

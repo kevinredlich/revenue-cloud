@@ -1,0 +1,80 @@
+{
+ "seed": 11,
+ "client_slug": "bodegas-altiplano",
+ "heroes": "ejemplo-heroes.json",
+ "owners": [],
+ "accounts": {
+  "count": 24,
+  "industries": [
+   "Food & Beverage",
+   "Hospitality",
+   "Retail"
+  ],
+  "cities": [
+   "Murcia",
+   "Alicante",
+   "Valencia",
+   "Albacete",
+   "Cartagena",
+   "Madrid"
+  ],
+  "company_words": [
+   "Distribuciones",
+   "Vinos",
+   "Comercial",
+   "Grupo Hostelero",
+   "Gourmet"
+  ],
+  "cif_field": "AccountNumber",
+  "random_fields": {
+   "Canal__c": [
+    "Distribuidor",
+    "HORECA",
+    "Gran superficie",
+    "Exportación"
+   ]
+  }
+ },
+ "contacts_per_account": [
+  1,
+  3
+ ],
+ "opportunities": {
+  "per_account": [
+   0,
+   3
+  ],
+  "stages": {
+   "Prospecting": 3,
+   "Qualification": 3,
+   "Needs Analysis": 2,
+   "Proposal/Price Quote": 2,
+   "Negotiation/Review": 1,
+   "Closed Won": 4,
+   "Closed Lost": 1
+  },
+  "amount": [
+   4000,
+   45000
+  ],
+  "products": [
+   "Pedido de temporada",
+   "Gama crianza",
+   "Reposición",
+   "Carta de vinos"
+  ],
+  "extra_fields": {
+   "Stage_Entered_Date__c": "TODAY-5"
+  }
+ },
+ "tasks_per_opportunity": [
+  0,
+  2
+ ],
+ "cases": {
+  "count": 0
+ },
+ "leads": {
+  "count": 6
+ }
+}

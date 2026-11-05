@@ -1,0 +1,286 @@
+{
+ "client_slug": "service-cloud",
+ "objects": [
+  {
+   "sobject": "Account",
+   "records": [
+    {
+     "ref": "ACC1",
+     "Name": "Conservas del Segura SL",
+     "Industry": "Food & Beverage",
+     "BillingCity": "Murcia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC2",
+     "Name": "Hotel Brisa Mediterránea SA",
+     "Industry": "Hospitality",
+     "BillingCity": "Alicante",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC3",
+     "Name": "Muebles Levante SL",
+     "Industry": "Retail",
+     "BillingCity": "Valencia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC4",
+     "Name": "Clínica Dental Sonrisa SL",
+     "Industry": "Healthcare",
+     "BillingCity": "Madrid",
+     "BillingCountry": "Spain"
+    }
+   ]
+  },
+  {
+   "sobject": "Contact",
+   "records": [
+    {
+     "ref": "CON1",
+     "FirstName": "Nuria",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Jefe de Ventas",
+     "Email": "nuria.perez1@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON2",
+     "FirstName": "Marta",
+     "LastName": "Rubio",
+     "AccountId": "@ACC2",
+     "Title": "Directora de Marketing",
+     "Email": "marta.rubio2@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Referido"
+    },
+    {
+     "ref": "CON3",
+     "FirstName": "Rocío",
+     "LastName": "Martínez",
+     "AccountId": "@ACC3",
+     "Title": "Responsable de Comunicación",
+     "Email": "rocio.martinez3@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Feria"
+    },
+    {
+     "ref": "CON4",
+     "FirstName": "Javier",
+     "LastName": "López",
+     "AccountId": "@ACC4",
+     "Title": "Jefe de Ventas",
+     "Email": "javier.lopez4@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Evento"
+    },
+    {
+     "ref": "CON9",
+     "FirstName": "Sergio",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Responsable de Comunicación",
+     "Email": "sergio.perez9@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON10",
+     "FirstName": "Rocío",
+     "LastName": "Navarro",
+     "AccountId": "@ACC2",
+     "Title": "Responsable de Comunicación",
+     "Email": "rocio.navarro10@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Feria"
+    },
+    {
+     "ref": "CON11",
+     "FirstName": "Carlos",
+     "LastName": "Ruiz",
+     "AccountId": "@ACC3",
+     "Title": "Gerente",
+     "Email": "carlos.ruiz11@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON12",
+     "FirstName": "Hugo",
+     "LastName": "López",
+     "AccountId": "@ACC4",
+     "Title": "Responsable de Comunicación",
+     "Email": "hugo.lopez12@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    }
+   ]
+  },
+  {
+   "sobject": "Entitlement",
+   "records": [
+    {
+     "ref": "ENT1",
+     "Name": "Soporte Estándar - Conservas del Segura SL",
+     "AccountId": "@ACC1",
+     "StartDate": "TODAY-180",
+     "EndDate": "TODAY+185",
+     "SlaProcessId": "{{SLA_PROCESS_ID}}"
+    },
+    {
+     "ref": "ENT2",
+     "Name": "Soporte Estándar - Hotel Brisa Mediterránea SA",
+     "AccountId": "@ACC2",
+     "StartDate": "TODAY-180",
+     "EndDate": "TODAY+185",
+     "SlaProcessId": "{{SLA_PROCESS_ID}}"
+    },
+    {
+     "ref": "ENT3",
+     "Name": "Soporte Estándar - Muebles Levante SL",
+     "AccountId": "@ACC3",
+     "StartDate": "TODAY-180",
+     "EndDate": "TODAY+185",
+     "SlaProcessId": "{{SLA_PROCESS_ID}}"
+    },
+    {
+     "ref": "ENT4",
+     "Name": "Soporte Estándar - Clínica Dental Sonrisa SL",
+     "AccountId": "@ACC4",
+     "StartDate": "TODAY-180",
+     "EndDate": "TODAY+185",
+     "SlaProcessId": "{{SLA_PROCESS_ID}}"
+    }
+   ]
+  },
+  {
+   "sobject": "Case",
+   "records": [
+    {
+     "ref": "CASE1",
+     "Subject": "No funciona el acceso al portal",
+     "Type": "Incidencia",
+     "Priority": "High",
+     "Status": "Working",
+     "Origin": "Phone",
+     "AccountId": "@ACC1",
+     "ContactId": "@CON1",
+     "EntitlementId": "@ENT1",
+     "CreatedDate": "NOW-26h"
+    },
+    {
+     "ref": "CASE2",
+     "Subject": "Solicitud de factura rectificativa",
+     "Type": "Consulta",
+     "Priority": "Medium",
+     "Status": "New",
+     "Origin": "Phone",
+     "AccountId": "@ACC2",
+     "ContactId": "@CON2",
+     "EntitlementId": "@ENT2",
+     "CreatedDate": "NOW-26h"
+    },
+    {
+     "ref": "CASE3",
+     "Subject": "Pedido entregado incompleto",
+     "Type": "Incidencia",
+     "Priority": "High",
+     "Status": "New",
+     "Origin": "Phone",
+     "AccountId": "@ACC3",
+     "ContactId": "@CON3",
+     "EntitlementId": "@ENT3",
+     "CreatedDate": "NOW-26h"
+    },
+    {
+     "ref": "CASE4",
+     "Subject": "Cambio de dirección de envío",
+     "Type": "Consulta",
+     "Priority": "Low",
+     "Status": "Working",
+     "Origin": "Web",
+     "AccountId": "@ACC4",
+     "ContactId": "@CON4",
+     "EntitlementId": "@ENT4"
+    },
+    {
+     "ref": "CASE5",
+     "Subject": "Error en el importe cobrado",
+     "Type": "Incidencia",
+     "Priority": "High",
+     "Status": "New",
+     "Origin": "Email",
+     "AccountId": "@ACC1",
+     "ContactId": "@CON1",
+     "EntitlementId": "@ENT1"
+    },
+    {
+     "ref": "CASE6",
+     "Subject": "Consulta sobre garantía",
+     "Type": "Consulta",
+     "Priority": "Medium",
+     "Status": "New",
+     "Origin": "Phone",
+     "AccountId": "@ACC2",
+     "ContactId": "@CON2",
+     "EntitlementId": "@ENT2"
+    },
+    {
+     "ref": "CASE7",
+     "Subject": "Producto dañado en transporte",
+     "Type": "Incidencia",
+     "Priority": "High",
+     "Status": "Working",
+     "Origin": "Phone",
+     "AccountId": "@ACC3",
+     "ContactId": "@CON3",
+     "EntitlementId": "@ENT3"
+    },
+    {
+     "ref": "CASE8",
+     "Subject": "Alta de nuevo usuario",
+     "Type": "Solicitud",
+     "Priority": "Low",
+     "Status": "New",
+     "Origin": "Email",
+     "AccountId": "@ACC4",
+     "ContactId": "@CON4",
+     "EntitlementId": "@ENT4"
+    },
+    {
+     "ref": "CASE9",
+     "Subject": "Duda sobre plazos de entrega",
+     "Type": "Consulta",
+     "Priority": "Medium",
+     "Status": "New",
+     "Origin": "Email",
+     "AccountId": "@ACC1",
+     "ContactId": "@CON1",
+     "EntitlementId": "@ENT1"
+    },
+    {
+     "ref": "CASE10",
+     "Subject": "Reclamación por retraso",
+     "Type": "Incidencia",
+     "Priority": "High",
+     "Status": "Working",
+     "Origin": "Email",
+     "AccountId": "@ACC2",
+     "ContactId": "@CON2",
+     "EntitlementId": "@ENT2"
+    }
+   ]
+  }
+ ]
+}

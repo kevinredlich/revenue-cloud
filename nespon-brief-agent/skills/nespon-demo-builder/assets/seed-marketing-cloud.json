@@ -1,0 +1,491 @@
+{
+ "client_slug": "marketing-cloud",
+ "objects": [
+  {
+   "sobject": "Account",
+   "records": [
+    {
+     "ref": "ACC1",
+     "Name": "Conservas del Segura SL",
+     "Industry": "Food & Beverage",
+     "BillingCity": "Murcia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC2",
+     "Name": "Hotel Brisa Mediterránea SA",
+     "Industry": "Hospitality",
+     "BillingCity": "Alicante",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC3",
+     "Name": "Muebles Levante SL",
+     "Industry": "Retail",
+     "BillingCity": "Valencia",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC4",
+     "Name": "Clínica Dental Sonrisa SL",
+     "Industry": "Healthcare",
+     "BillingCity": "Madrid",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC5",
+     "Name": "Bodegas Altiplano SA",
+     "Industry": "Food & Beverage",
+     "BillingCity": "Jumilla",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC6",
+     "Name": "Gimnasios Activa SL",
+     "Industry": "Other",
+     "BillingCity": "Cartagena",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC7",
+     "Name": "Ópticas Visión Sur SL",
+     "Industry": "Retail",
+     "BillingCity": "Almería",
+     "BillingCountry": "Spain"
+    },
+    {
+     "ref": "ACC8",
+     "Name": "Academia Idiomas Puerto SL",
+     "Industry": "Education",
+     "BillingCity": "Málaga",
+     "BillingCountry": "Spain"
+    }
+   ]
+  },
+  {
+   "sobject": "Contact",
+   "records": [
+    {
+     "ref": "CON1",
+     "FirstName": "Nuria",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Jefe de Ventas",
+     "Email": "nuria.perez1@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON2",
+     "FirstName": "Marta",
+     "LastName": "Rubio",
+     "AccountId": "@ACC2",
+     "Title": "Directora de Marketing",
+     "Email": "marta.rubio2@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON3",
+     "FirstName": "Rocío",
+     "LastName": "Martínez",
+     "AccountId": "@ACC3",
+     "Title": "Responsable de Comunicación",
+     "Email": "rocio.martinez3@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON4",
+     "FirstName": "Javier",
+     "LastName": "López",
+     "AccountId": "@ACC4",
+     "Title": "Jefe de Ventas",
+     "Email": "javier.lopez4@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON5",
+     "FirstName": "Marta",
+     "LastName": "Díaz",
+     "AccountId": "@ACC5",
+     "Title": "Directora de Marketing",
+     "Email": "marta.diaz5@example.com",
+     "MailingCity": "Jumilla",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON6",
+     "FirstName": "Javier",
+     "LastName": "Sánchez",
+     "AccountId": "@ACC6",
+     "Title": "Responsable de Compras",
+     "Email": "javier.sanchez6@example.com",
+     "MailingCity": "Cartagena",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON7",
+     "FirstName": "Rocío",
+     "LastName": "Gil",
+     "AccountId": "@ACC7",
+     "Title": "Directora de Marketing",
+     "Email": "rocio.gil7@example.com",
+     "MailingCity": "Almería",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON8",
+     "FirstName": "Javier",
+     "LastName": "Rubio",
+     "AccountId": "@ACC8",
+     "Title": "Responsable de Compras",
+     "Email": "javier.rubio8@example.com",
+     "MailingCity": "Málaga",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON9",
+     "FirstName": "Sergio",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Responsable de Comunicación",
+     "Email": "sergio.perez9@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON10",
+     "FirstName": "Rocío",
+     "LastName": "Navarro",
+     "AccountId": "@ACC2",
+     "Title": "Responsable de Comunicación",
+     "Email": "rocio.navarro10@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON11",
+     "FirstName": "Carlos",
+     "LastName": "Ruiz",
+     "AccountId": "@ACC3",
+     "Title": "Gerente",
+     "Email": "carlos.ruiz11@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON12",
+     "FirstName": "Hugo",
+     "LastName": "López",
+     "AccountId": "@ACC4",
+     "Title": "Responsable de Comunicación",
+     "Email": "hugo.lopez12@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON13",
+     "FirstName": "Iván",
+     "LastName": "Ruiz",
+     "AccountId": "@ACC5",
+     "Title": "Jefe de Ventas",
+     "Email": "ivan.ruiz13@example.com",
+     "MailingCity": "Jumilla",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON14",
+     "FirstName": "Nuria",
+     "LastName": "Molina",
+     "AccountId": "@ACC6",
+     "Title": "Responsable de Comunicación",
+     "Email": "nuria.molina14@example.com",
+     "MailingCity": "Cartagena",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON15",
+     "FirstName": "Raúl",
+     "LastName": "Navarro",
+     "AccountId": "@ACC7",
+     "Title": "Responsable de Compras",
+     "Email": "raul.navarro15@example.com",
+     "MailingCity": "Almería",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON16",
+     "FirstName": "Diego",
+     "LastName": "López",
+     "AccountId": "@ACC8",
+     "Title": "Responsable de Comunicación",
+     "Email": "diego.lopez16@example.com",
+     "MailingCity": "Málaga",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON17",
+     "FirstName": "Carmen",
+     "LastName": "Ortega",
+     "AccountId": "@ACC1",
+     "Title": "Gerente",
+     "Email": "carmen.ortega17@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON18",
+     "FirstName": "Andrés",
+     "LastName": "López",
+     "AccountId": "@ACC2",
+     "Title": "Directora de Marketing",
+     "Email": "andres.lopez18@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON19",
+     "FirstName": "Pablo",
+     "LastName": "Torres",
+     "AccountId": "@ACC3",
+     "Title": "Responsable de Compras",
+     "Email": "pablo.torres19@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON20",
+     "FirstName": "Sergio",
+     "LastName": "Martínez",
+     "AccountId": "@ACC4",
+     "Title": "Director Financiero",
+     "Email": "sergio.martinez20@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON21",
+     "FirstName": "Hugo",
+     "LastName": "Torres",
+     "AccountId": "@ACC5",
+     "Title": "Gerente",
+     "Email": "hugo.torres21@example.com",
+     "MailingCity": "Jumilla",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON22",
+     "FirstName": "Iván",
+     "LastName": "Ortega",
+     "AccountId": "@ACC6",
+     "Title": "Responsable de Comunicación",
+     "Email": "ivan.ortega22@example.com",
+     "MailingCity": "Cartagena",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON23",
+     "FirstName": "Marta",
+     "LastName": "López",
+     "AccountId": "@ACC7",
+     "Title": "Gerente",
+     "Email": "marta.lopez23@example.com",
+     "MailingCity": "Almería",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON24",
+     "FirstName": "Marta",
+     "LastName": "Martínez",
+     "AccountId": "@ACC8",
+     "Title": "Director Financiero",
+     "Email": "marta.martinez24@example.com",
+     "MailingCity": "Málaga",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON25",
+     "FirstName": "Rocío",
+     "LastName": "Molina",
+     "AccountId": "@ACC1",
+     "Title": "Gerente",
+     "Email": "rocio.molina25@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON26",
+     "FirstName": "Raúl",
+     "LastName": "García",
+     "AccountId": "@ACC2",
+     "Title": "Jefe de Ventas",
+     "Email": "raul.garcia26@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON27",
+     "FirstName": "Pablo",
+     "LastName": "Sánchez",
+     "AccountId": "@ACC3",
+     "Title": "Jefe de Ventas",
+     "Email": "pablo.sanchez27@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON28",
+     "FirstName": "Sara",
+     "LastName": "Navarro",
+     "AccountId": "@ACC4",
+     "Title": "Responsable de Compras",
+     "Email": "sara.navarro28@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON29",
+     "FirstName": "Irene",
+     "LastName": "Gil",
+     "AccountId": "@ACC5",
+     "Title": "Jefe de Ventas",
+     "Email": "irene.gil29@example.com",
+     "MailingCity": "Jumilla",
+     "MailingCountry": "Spain",
+     "LeadSource": "Web"
+    },
+    {
+     "ref": "CON30",
+     "FirstName": "Pablo",
+     "LastName": "Molina",
+     "AccountId": "@ACC6",
+     "Title": "Jefe de Ventas",
+     "Email": "pablo.molina30@example.com",
+     "MailingCity": "Cartagena",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON31",
+     "FirstName": "Elena",
+     "LastName": "Serrano",
+     "AccountId": "@ACC7",
+     "Title": "Responsable de Comunicación",
+     "Email": "elena.serrano31@example.com",
+     "MailingCity": "Almería",
+     "MailingCountry": "Spain",
+     "LeadSource": "Partner Referral"
+    },
+    {
+     "ref": "CON32",
+     "FirstName": "Sergio",
+     "LastName": "Ramos",
+     "AccountId": "@ACC8",
+     "Title": "Director Financiero",
+     "Email": "sergio.ramos32@example.com",
+     "MailingCity": "Málaga",
+     "MailingCountry": "Spain",
+     "LeadSource": "Phone Inquiry"
+    },
+    {
+     "ref": "CON33",
+     "FirstName": "Diego",
+     "LastName": "Pérez",
+     "AccountId": "@ACC1",
+     "Title": "Directora de Marketing",
+     "Email": "diego.perez33@example.com",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON34",
+     "FirstName": "Elena",
+     "LastName": "Díaz",
+     "AccountId": "@ACC2",
+     "Title": "Director Financiero",
+     "Email": "elena.diaz34@example.com",
+     "MailingCity": "Alicante",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON35",
+     "FirstName": "Lucía",
+     "LastName": "Ortega",
+     "AccountId": "@ACC3",
+     "Title": "Responsable de Comunicación",
+     "Email": "lucia.ortega35@example.com",
+     "MailingCity": "Valencia",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON36",
+     "FirstName": "Laura",
+     "LastName": "Navarro",
+     "AccountId": "@ACC4",
+     "Title": "Directora de Marketing",
+     "Email": "laura.navarro36@example.com",
+     "MailingCity": "Madrid",
+     "MailingCountry": "Spain",
+     "LeadSource": "Other"
+    },
+    {
+     "ref": "CON-SE",
+     "FirstName": "Contacto",
+     "LastName": "Pruebas SE",
+     "AccountId": "@ACC1",
+     "Title": "Contacto de pruebas",
+     "Email": "{{SE_EMAIL}}",
+     "MailingCity": "Murcia",
+     "MailingCountry": "Spain"
+    }
+   ]
+  },
+  {
+   "sobject": "Campaign",
+   "records": [
+    {
+     "ref": "CMP1",
+     "Name": "Lanzamiento Otoño",
+     "Status": "Planned",
+     "Type": "Email",
+     "StartDate": "TODAY+3",
+     "EndDate": "TODAY+45",
+     "IsActive": true
+    }
+   ]
+  }
+ ]
+}
